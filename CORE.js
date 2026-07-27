@@ -753,54 +753,6 @@ function getActionPlan_(userSpreadsheet) {
       blocks.push({ idx: idx++, quarter: grp.key, quarterLabel: grp.label, goal: headerText, tactics });
     });
   }
-  const statusOptions = getValidationOptions_(s, AP_BLOCK_START_ROW + AP_DATA_OFFSET, AP_GROUPS[0].colStatus, AP_STATUS_OPTIONS);
-  return { blocks, statusOptions };
-}
-
-  const lastRow = Math.min(AP_MAX_ROW, s.getLastRow());
-  const lastCol = 16;
-  if (lastRow < AP_BLOCK_START_ROW) return { blocks: [], statusOptions: AP_STATUS_OPTIONS };
-  const grid = s.getRange(1, 1, lastRow, lastCol).getDisplayValues();
-  const formulaGrid = s.getRange(1, 1, lastRow, lastCol).getFormulas();
-  const cell = (r, c) => (grid[r - 1] && grid[r - 1][c - 1] !== undefined) ? grid[r - 1][c - 1] : '';
-  const cellF = (r, c) => (formulaGrid[r - 1] && formulaGrid[r - 1][c - 1] !== undefined) ? formulaGrid[r - 1][c - 1] : '';
-
-  const blocks = [];
-  let idx = 0;
-  for (let start = AP_BLOCK_START_ROW; start <= lastRow; start += AP_BLOCK_SIZE) {
-    AP_GROUPS.forEach(grp => {
-      const headerRow = start + AP_HEADER_OFFSET;
-      if (headerRow > lastRow) return;
-      const headerText = cell(headerRow, grp.colGoal);
-      if (!headerText || headerText === AP_PLACEHOLDER || isUnresolved_(headerText, cellF(headerRow, grp.colGoal)) || looksLikeArtifact_(headerText)) return;
-
-      const dataStart = start + AP_DATA_OFFSET;
-      const tactics = [];
-      for (let j = 0; j < AP_DATA_ROWS; j++) {
-        const r = dataStart + j;
-        if (r > lastRow) break;
-        const taktikVal = cell(r, grp.colTaktik);
-        if (!taktikVal || isUnresolved_(taktikVal, cellF(r, grp.colTaktik)) || looksLikeArtifact_(taktikVal)) continue;
-
-        const frekValRaw = cell(r, grp.colFrek);
-        const frekBad = isUnresolved_(frekValRaw, cellF(r, grp.colFrek)) || looksLikeArtifact_(frekValRaw);
-        const frekuensi = frekBad ? '' : frekValRaw;
-        const statusValRaw = cell(r, grp.colStatus);
-        const statusBad = isUnresolved_(statusValRaw, cellF(r, grp.colStatus)) || looksLikeArtifact_(statusValRaw);
-        const status = statusBad ? 'Belum Dimulai' : (statusValRaw || 'Belum Dimulai');
-        const meta = frekuensi ? parseFrequencyMeta_(frekuensi) : { target: 1, periodWeeks: 1 };
-
-        tactics.push({
-          no: cell(r, grp.colNo), taktik: taktikVal, frekuensi, status,
-          target: meta.target, periodWeeks: meta.periodWeeks,
-          row: r, statusCol: grp.colStatus,
-        });
-      }
-      if (tactics.length === 0) return;
-      blocks.push({ idx: idx++, quarter: grp.key, quarterLabel: grp.label, goal: headerText, tactics });
-    });
-  }
-  const statusOptions = getValidationOptions_(s, AP_BLOCK_START_ROW + AP_DATA_OFFSET, AP_GROUPS[0].colStatus, AP_STATUS_OPTIONS);
   return { blocks, statusOptions };
 }
 const ID_NUM_WORDS_ = { satu:1, dua:2, tiga:3, empat:4, lima:5, enam:6, tujuh:7, delapan:8 };
