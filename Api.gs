@@ -5,8 +5,15 @@ function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
     var action = data.action;
-    var token = data.token; // Token aktivasi unik user
+    var token = data.token || data.code; // Token aktivasi unik user
     var payload = data.payload || {};
+    
+    // 0. Penanganan khusus untuk validasi lisensi dari Rumah B / Dashboard
+    if (action === "validate") {
+      var validationResult = handleValidateAction_(data);
+      return ContentService.createTextOutput(JSON.stringify(validationResult))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     
     // 1. Validasi Token dan Ambil Spreadsheet ID milik user dari database 'activations'
     var userInfo = getUserInfoByToken_(token);
@@ -18,6 +25,13 @@ function doPost(e) {
     }
     
     var userSpreadsheetId = userInfo.spreadsheetId;
+    if (!userSpreadsheetId) {
+      return ContentService.createTextOutput(JSON.stringify({
+        success: false, 
+        message: "Spreadsheet ID pengguna belum terdaftar di kolom database (Kolom I)."
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
     var userSpreadsheet = SpreadsheetApp.openById(userSpreadsheetId);
     
     // 2. Routing aksi berdasarkan permintaan dari Vercel
@@ -110,6 +124,41 @@ function doPost(e) {
 }
 
 /**
+ * Helper: Penanganan aksi 'validate' lisensi dari Rumah B / Dashboard
+ */
+function handleValidateAction_(data) {
+  var secret = data.secret;
+  var email = data.email;
+  var code = data.code || data.token;
+
+  var expectedSecret = PropertiesService.getScriptProperties().getProperty('VALIDATE_SECRET') || "ikg_valid_z4Tn9wRfB7cJ";
+  if (secret !== expectedSecret) {
+    return { valid: false, reason: "Secret key tidak cocok." };
+  }
+
+  var activationsSpreadsheetId = "MASUKKAN_ACTIVATIONS_SPREADSHEET_ID_DI_SINI";
+  var sheet = SpreadsheetApp.openById(activationsSpreadsheetId).getSheetByName("Activations");
+  var rows = sheet.getDataRange().getValues();
+
+  for (var i = 1; i < rows.length; i++) {
+    var rowCode = String(rows[i][6] || '').trim(); // Indeks 6 (Kolom G - Code)
+    var rowEmail = String(rows[i][3] || '').trim(); // Indeks 3 (Kolom D - Email)
+    var rowStatus = String(rows[i][7] || '').trim().toLowerCase(); // Indeks 7 (Kolom H - Status)
+
+    if (rowCode === code) {
+      if (rowStatus !== 'aktif') {
+        return { valid: false, reason: 'Lisensi/token ini sudah tidak aktif.' };
+      }
+      if (rowEmail.toLowerCase() !== email.toLowerCase()) {
+        return { valid: false, reason: 'Token ini tidak terdaftar untuk email Google ' + email };
+      }
+      return { valid: true, produk: rows[i][5] || '' };
+    }
+  }
+  return { valid: false, reason: 'Token aktivasi tidak ditemukan.' };
+}
+
+/**
  * Helper: Cari data user di sheet 'activations' berdasarkan token
  */
 function getUserInfoByToken_(token) {
@@ -117,15 +166,13 @@ function getUserInfoByToken_(token) {
   var sheet = SpreadsheetApp.openById(activationsSpreadsheetId).getSheetByName("Activations");
   var rows = sheet.getDataRange().getValues();
   
-  // Asumsi kolom: [1] No, [2] Timestamp, [3] Nama, [4] Email, [5] Whatsapp, [6] Produk, [7] Code, [8] Status
-  // Catatan: Pastikan Spreadsheet ID disimpan di kolom tersembunyi atau kita petakan dengan benar.
-  // Sebagai contoh sederhana, mari kita asumsikan Spreadsheet ID disimpan di kolom ke-9 (kolom I).
+  // Asumsi kolom: [0] No, [1] Timestamp, [2] Nama, [3] Email, [4] Whatsapp, [5] Produk, [6] Code, [7] Status
   for (var i = 1; i < rows.length; i++) {
-    var rowCode = rows[i][6]; // Kolom Code (indeks 6)
-    if (rowCode === token && rows[i][7].toLowerCase() === "aktif") {
+    var rowCode = String(rows[i][6] || '').trim(); // Kolom Code (indeks 6 / Kolom G)
+    if (rowCode === token && String(rows[i][7] || '').trim().toLowerCase() === "aktif") {
       return {
         email: rows[i][3],
-        spreadsheetId: rows[i][8] // Kolom tempat Anda menyimpan Spreadsheet ID user
+        spreadsheetId: rows[i][8] // Kolom tempat Anda menyimpan Spreadsheet ID user (Indeks 8 / Kolom I)
       };
     }
   }
@@ -136,7 +183,7 @@ function getUserInfoByToken_(token) {
  * Helper: Ambil data untuk dikirim ke Sidebar Vercel
  */
 function handleGetData_(spreadsheet) {
-  var sheet = spreadsheet.getSheetByName("DREAM PLAN"); // Contoh sheet
+  var sheet = spreadsheet.getSheetByName("DREAM PLAN");
   var data = sheet.getDataRange().getValues();
   return { success: true, data: data };
 }
@@ -150,7 +197,6 @@ function handleUpdateData_(spreadsheet, payload) {
     return { success: false, message: "Sheet target tidak ditemukan." };
   }
   
-  // Contoh menulis data ke cell tertentu
   sheet.getRange(payload.range).setValue(payload.value);
   return { success: true, message: "Data berhasil diperbarui." };
 }
