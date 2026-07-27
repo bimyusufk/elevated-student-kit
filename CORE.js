@@ -4,18 +4,18 @@
 // Desain & logic dashboard di bawah SAMA PERSIS kayak versi asli —
 // yang baru cuma bagian AKTIVASI + HIDE/PROTECT di paling atas.
 // ============================================================
-const SHEET_IKIGAI  = 'IKIGAI';
-const SHEET_SWOT    = 'SWOT ANALYSIS';
-const SHEET_DREAM   = 'DREAM PLAN';
+const SHEET_IKIGAI = 'IKIGAI';
+const SHEET_SWOT = 'SWOT ANALYSIS';
+const SHEET_DREAM = 'DREAM PLAN';
 const SHEET_COLLEGE = 'COLLEGE PLAN';
-const SHEET_ACTION  = 'ACTION PLAN';
+const SHEET_ACTION = 'ACTION PLAN';
 const SHEET_TRACKER_STATE = 'TRACKER_STATE';
 const SHEET_WELCOME = 'WELCOME';
 
 // ============================================================
 // GERBANG AKTIVASI
 // ============================================================
-const RUMAH_A_URL = 'https://script.google.com/macros/s/AKfycbzK2KIZk2_EnEHLFs_a3ABBNksuBfeLw-suE5w3xDZHAVCyH-1fWZF6XEGr7qG1RHqA/exec';
+const RUMAH_A_URL = 'https://script.google.com/macros/s/AKfycbxQs03Uk7Of9srdlaK7KO0bVeNCyjbcF2EM1M5qbvx7MLTxvk8iI0EBA2QsuxN6M3xl/exec';
 const WELCOME_CODE_CELL = 'G23'; // cell token di tab WELCOME (merged G23:H24)
 const PROP_ACTIVATED = 'ikigai_activated';
 const PROP_ACTIVATED_EMAIL = 'ikigai_activated_email';
@@ -75,13 +75,13 @@ function validateAgainstRumahA_(email, code) {
   }
 
   let result;
-  try { 
-    result = JSON.parse(response.getContentText()); 
+  try {
+    result = JSON.parse(response.getContentText());
     Logger.log('[DEBUG] Parsed JSON Response: ' + JSON.stringify(result));
   }
-  catch (err) { 
+  catch (err) {
     Logger.log('[DEBUG] Gagal parse JSON response.');
-    return { valid: false, error: 'Respons server lisensi tidak valid.' }; 
+    return { valid: false, error: 'Respons server lisensi tidak valid.' };
   }
 
   if (result.error) {
@@ -92,7 +92,7 @@ function validateAgainstRumahA_(email, code) {
     Logger.log('[DEBUG] Ditolak oleh server, invalid reason: ' + (result.reason || 'Token tidak valid'));
     return { valid: false, error: result.reason || 'Token tidak valid untuk akun ini.' };
   }
-  
+
   Logger.log('[DEBUG] Validasi Sukses!');
   return { valid: true, produk: result.produk || '' };
 }
@@ -189,7 +189,7 @@ function activateWithToken(userSpreadsheet, inputToken) {
 
   const result = validateAgainstRumahA_(email, code);
   Logger.log('[DEBUG] Hasil dari validateAgainstRumahA_: ' + JSON.stringify(result));
-  
+
   if (!result.valid) {
     Logger.log('[DEBUG] Aktivasi dibatalkan karena validasi gagal.');
     return { success: false, error: result.error };
@@ -203,7 +203,7 @@ function activateWithToken(userSpreadsheet, inputToken) {
         Logger.log('[DEBUG] Berhasil menulis token ke sheet WELCOME.');
       }
     }
-  } catch (e) { 
+  } catch (e) {
     Logger.log('[DEBUG] Exception saat menulis ke sheet WELCOME: ' + e.message);
   }
 
@@ -360,23 +360,23 @@ function removeWarningProtection_(sheet) {
 // ============================================================
 
 const DREAM_DATA_START_ROW = 18;
-const DREAM_DATA_END_ROW   = 67;
-const DREAM_COL = { no:2, goal:3, targetSem:4, smart:5, status:7, priority:9, decision:10, notes:11 };
+const DREAM_DATA_END_ROW = 67;
+const DREAM_COL = { no: 2, goal: 3, targetSem: 4, smart: 5, status: 7, priority: 9, decision: 10, notes: 11 };
 const DREAM_STATUS_OPTIONS = ['On Progress', 'Tercapai', 'Gagal'];
 
 const COLLEGE_DATA_START_ROW = 5;
-const COLLEGE_DATA_END_ROW   = 25;
-const COLLEGE_COL = { no:9, misi:10, semester:11, kategori:12, prioritas:13, progress:14 };
+const COLLEGE_DATA_END_ROW = 25;
+const COLLEGE_COL = { no: 9, misi: 10, semester: 11, kategori: 12, prioritas: 13, progress: 14 };
 const COLLEGE_STATUS_OPTIONS = ['Belum Mulai', 'On Progress', 'Tercapai', 'Gagal'];
 
 const AP_BLOCK_START_ROW = 4;
-const AP_BLOCK_SIZE      = 13;
-const AP_HEADER_OFFSET   = 0;
-const AP_DATA_OFFSET     = 2;
-const AP_DATA_ROWS       = 10;
-const AP_MAX_ROW         = 1013;
+const AP_BLOCK_SIZE = 13;
+const AP_HEADER_OFFSET = 0;
+const AP_DATA_OFFSET = 2;
+const AP_DATA_ROWS = 10;
+const AP_MAX_ROW = 1013;
 const AP_GROUPS = [
-  { key: 'Q1', label: 'Quarter 1', colGoal: 6,  colNo: 6,  colTaktik: 7,  colFrek: 8,  colStatus: 9  },
+  { key: 'Q1', label: 'Quarter 1', colGoal: 6, colNo: 6, colTaktik: 7, colFrek: 8, colStatus: 9 },
   { key: 'Q2', label: 'Quarter 2', colGoal: 13, colNo: 13, colTaktik: 14, colFrek: 15, colStatus: 16 },
 ];
 const AP_PLACEHOLDER = 'Pilih Goal dari SMART Dreams di kiri...';
@@ -392,19 +392,19 @@ function looksLikeArtifact_(text) {
 }
 
 const TRACKER_WEEKS_PER_QUARTER = 12;
-const DAY_NAMES = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+const DAY_NAMES = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
 const SCORE_DREAM_TERCAPAI = 10;
 const SCORE_DREAM_PROGRESS = 2;
 const SCORE_COLLEGE_TERCAPAI = 5;
 const SCORE_TRACKER_CHECK = 1;
 const BADGES = [
-  { min: 0,   name: 'Pemula Ikigai',  icon: '🌱' },
-  { min: 20,  name: 'Mulai Panas',    icon: '🔥' },
-  { min: 50,  name: 'Konsisten',      icon: '⭐' },
-  { min: 100, name: 'Achiever',       icon: '🏆' },
-  { min: 200, name: 'Master Ikigai',  icon: '👑' },
-  { min: 350, name: 'Living Legend',  icon: '💎' },
+  { min: 0, name: 'Pemula Ikigai', icon: '🌱' },
+  { min: 20, name: 'Mulai Panas', icon: '🔥' },
+  { min: 50, name: 'Konsisten', icon: '⭐' },
+  { min: 100, name: 'Achiever', icon: '🏆' },
+  { min: 200, name: 'Master Ikigai', icon: '👑' },
+  { min: 350, name: 'Living Legend', icon: '💎' },
 ];
 
 const SS_ID_PROP_KEY = 'ikigai_ss_id';
@@ -600,10 +600,10 @@ function getPersonal_(userSpreadsheet) {
   if (sw) {
     const swGrid = sw.getRange(1, 1, sw.getLastRow(), sw.getLastColumn()).getDisplayValues();
     const gs = a1 => cellFromGrid_(swGrid, a1);
-    swot.strength    = [gs('D23'), gs('D24'), gs('D25')].filter(Boolean);
-    swot.weakness    = [gs('F23'), gs('F24'), gs('F25')].filter(Boolean);
+    swot.strength = [gs('D23'), gs('D24'), gs('D25')].filter(Boolean);
+    swot.weakness = [gs('F23'), gs('F24'), gs('F25')].filter(Boolean);
     swot.opportunity = [gs('H23'), gs('H24'), gs('H25')].filter(Boolean);
-    swot.threat      = [gs('J23'), gs('J24'), gs('J25')].filter(Boolean);
+    swot.threat = [gs('J23'), gs('J24'), gs('J25')].filter(Boolean);
     swotSummary = gs('F6');
   }
   return { name, major, semester, semesterNum: semesterNum_(semester), linear, mbti, via, careerExplorer, ikigaiSpot, sliceOfLife, sweetspot, hardskills, softskills, swot, ikigaiSummary, swotSummary };
@@ -751,7 +751,7 @@ function getActionPlan_(userSpreadsheet) {
   }
   return { blocks, statusOptions };
 }
-const ID_NUM_WORDS_ = { satu:1, dua:2, tiga:3, empat:4, lima:5, enam:6, tujuh:7, delapan:8 };
+const ID_NUM_WORDS_ = { satu: 1, dua: 2, tiga: 3, empat: 4, lima: 5, enam: 6, tujuh: 7, delapan: 8 };
 function wordOrDigitToNum_(s) {
   if (!s) return null;
   if (/^\d+$/.test(s)) return Number(s);
@@ -762,8 +762,8 @@ function parseFrequencyMeta_(freq) {
 
   let periodWeeks = 1;
   const pm = t.match(/setiap\s+(dua|tiga|empat|lima|enam|\d+)\s*minggu/) ||
-             t.match(/(dua|tiga|empat|lima|enam|\d+)\s*minggu\s*sekali/) ||
-             t.match(/(?:tiap|per)\s+(dua|tiga|empat|lima|enam|\d+)\s*minggu/);
+    t.match(/(dua|tiga|empat|lima|enam|\d+)\s*minggu\s*sekali/) ||
+    t.match(/(?:tiap|per)\s+(dua|tiga|empat|lima|enam|\d+)\s*minggu/);
   if (pm) {
     const n = wordOrDigitToNum_(pm[1]);
     if (n) periodWeeks = n;
@@ -1019,30 +1019,30 @@ const VIA_INFO = {
   spirituality: 'Kamu punya rasa purpose/makna yang kuat tentang kenapa kamu ngelakuin sesuatu — bikin kamu lebih tahan banting ngejar tujuan jangka panjang.',
 };
 const VIA_ALIASES = {
-  kreativitas:'creativity', kreatif:'creativity',
-  rasaingintahu:'curiosity', keingintahuan:'curiosity',
-  penilaian:'judgment', berpikirkritis:'judgment', criticalthinking:'judgment', pemikirankritis:'judgment',
-  cintabelajar:'loveoflearning',
-  perspektif:'perspective', kebijaksanaan:'perspective', wisdom:'perspective',
-  keberanian:'bravery',
-  ketekunan:'perseverance', kegigihan:'perseverance',
-  kejujuran:'honesty', autentik:'honesty', authenticity:'honesty',
-  semangat:'zest', antusiasme:'zest',
-  cinta:'love',
-  kebaikan:'kindness', kebaikanhati:'kindness',
-  kecerdasansosial:'socialintelligence',
-  kerjasama:'teamwork', kewargaan:'teamwork', citizenship:'teamwork',
-  keadilan:'fairness',
-  kepemimpinan:'leadership',
-  pemaaf:'forgiveness', pengampunan:'forgiveness',
-  kerendahanhati:'humility', modesty:'humility',
-  kehatihatian:'prudence',
-  pengaturandiri:'selfregulation', selfregulation:'selfregulation',
-  apresiasikeindahan:'appreciationofbeauty', appreciationofbeauty:'appreciationofbeauty',
-  rasasyukur:'gratitude', bersyukur:'gratitude',
-  harapan:'hope', optimisme:'hope', optimism:'hope',
-  humor:'humor', seleraumor:'humor',
-  spiritualitas:'spirituality', maknahidup:'spirituality', purpose:'spirituality',
+  kreativitas: 'creativity', kreatif: 'creativity',
+  rasaingintahu: 'curiosity', keingintahuan: 'curiosity',
+  penilaian: 'judgment', berpikirkritis: 'judgment', criticalthinking: 'judgment', pemikirankritis: 'judgment',
+  cintabelajar: 'loveoflearning',
+  perspektif: 'perspective', kebijaksanaan: 'perspective', wisdom: 'perspective',
+  keberanian: 'bravery',
+  ketekunan: 'perseverance', kegigihan: 'perseverance',
+  kejujuran: 'honesty', autentik: 'honesty', authenticity: 'honesty',
+  semangat: 'zest', antusiasme: 'zest',
+  cinta: 'love',
+  kebaikan: 'kindness', kebaikanhati: 'kindness',
+  kecerdasansosial: 'socialintelligence',
+  kerjasama: 'teamwork', kewargaan: 'teamwork', citizenship: 'teamwork',
+  keadilan: 'fairness',
+  kepemimpinan: 'leadership',
+  pemaaf: 'forgiveness', pengampunan: 'forgiveness',
+  kerendahanhati: 'humility', modesty: 'humility',
+  kehatihatian: 'prudence',
+  pengaturandiri: 'selfregulation', selfregulation: 'selfregulation',
+  apresiasikeindahan: 'appreciationofbeauty', appreciationofbeauty: 'appreciationofbeauty',
+  rasasyukur: 'gratitude', bersyukur: 'gratitude',
+  harapan: 'hope', optimisme: 'hope', optimism: 'hope',
+  humor: 'humor', seleraumor: 'humor',
+  spiritualitas: 'spirituality', maknahidup: 'spirituality', purpose: 'spirituality',
 };
 function lookupVia_(name) {
   const norm = normKey_(name);
@@ -1092,57 +1092,57 @@ function getIdentityBundle(userSpreadsheet) { return getIdentityReport_(userSpre
 // ============================================================
 
 const SETUP_FIELDS = {
-  ctx_name:        { sheet: SHEET_IKIGAI, cell: 'D4' },
-  ctx_major:       { sheet: SHEET_IKIGAI, cell: 'D5' },
-  ctx_semester:    { sheet: SHEET_IKIGAI, cell: 'D6' },
-  ctx_linear:      { sheet: SHEET_IKIGAI, cell: 'D7' },
-  ik_mbti:         { sheet: SHEET_IKIGAI, cell: 'C13' },
-  ik_via1:         { sheet: SHEET_IKIGAI, cell: 'D14' },
-  ik_via2:         { sheet: SHEET_IKIGAI, cell: 'E14' },
-  ik_via3:         { sheet: SHEET_IKIGAI, cell: 'F14' },
-  ik_career1:      { sheet: SHEET_IKIGAI, cell: 'G14' },
-  ik_career2:      { sheet: SHEET_IKIGAI, cell: 'H14' },
-  ik_career3:      { sheet: SHEET_IKIGAI, cell: 'I14' },
-  ik_spot:         { sheet: SHEET_IKIGAI, cell: 'C23' },
-  ik_slice:        { sheet: SHEET_IKIGAI, cell: 'C27' },
-  ik_sweetspot:    { sheet: SHEET_IKIGAI, cell: 'C37' },
-  ik_hard1:        { sheet: SHEET_IKIGAI, cell: 'D38' },
-  ik_hard2:        { sheet: SHEET_IKIGAI, cell: 'E38' },
-  ik_hard3:        { sheet: SHEET_IKIGAI, cell: 'F38' },
-  ik_soft1:        { sheet: SHEET_IKIGAI, cell: 'G38' },
-  ik_soft2:        { sheet: SHEET_IKIGAI, cell: 'H38' },
-  ik_soft3:        { sheet: SHEET_IKIGAI, cell: 'I38' },
-  sw_strength1:    { sheet: SHEET_SWOT, cell: 'D23' },
-  sw_strength2:    { sheet: SHEET_SWOT, cell: 'D24' },
-  sw_strength3:    { sheet: SHEET_SWOT, cell: 'D25' },
-  sw_weakness1:    { sheet: SHEET_SWOT, cell: 'F23' },
-  sw_weakness2:    { sheet: SHEET_SWOT, cell: 'F24' },
-  sw_weakness3:    { sheet: SHEET_SWOT, cell: 'F25' },
+  ctx_name: { sheet: SHEET_IKIGAI, cell: 'D4' },
+  ctx_major: { sheet: SHEET_IKIGAI, cell: 'D5' },
+  ctx_semester: { sheet: SHEET_IKIGAI, cell: 'D6' },
+  ctx_linear: { sheet: SHEET_IKIGAI, cell: 'D7' },
+  ik_mbti: { sheet: SHEET_IKIGAI, cell: 'C13' },
+  ik_via1: { sheet: SHEET_IKIGAI, cell: 'D14' },
+  ik_via2: { sheet: SHEET_IKIGAI, cell: 'E14' },
+  ik_via3: { sheet: SHEET_IKIGAI, cell: 'F14' },
+  ik_career1: { sheet: SHEET_IKIGAI, cell: 'G14' },
+  ik_career2: { sheet: SHEET_IKIGAI, cell: 'H14' },
+  ik_career3: { sheet: SHEET_IKIGAI, cell: 'I14' },
+  ik_spot: { sheet: SHEET_IKIGAI, cell: 'C23' },
+  ik_slice: { sheet: SHEET_IKIGAI, cell: 'C27' },
+  ik_sweetspot: { sheet: SHEET_IKIGAI, cell: 'C37' },
+  ik_hard1: { sheet: SHEET_IKIGAI, cell: 'D38' },
+  ik_hard2: { sheet: SHEET_IKIGAI, cell: 'E38' },
+  ik_hard3: { sheet: SHEET_IKIGAI, cell: 'F38' },
+  ik_soft1: { sheet: SHEET_IKIGAI, cell: 'G38' },
+  ik_soft2: { sheet: SHEET_IKIGAI, cell: 'H38' },
+  ik_soft3: { sheet: SHEET_IKIGAI, cell: 'I38' },
+  sw_strength1: { sheet: SHEET_SWOT, cell: 'D23' },
+  sw_strength2: { sheet: SHEET_SWOT, cell: 'D24' },
+  sw_strength3: { sheet: SHEET_SWOT, cell: 'D25' },
+  sw_weakness1: { sheet: SHEET_SWOT, cell: 'F23' },
+  sw_weakness2: { sheet: SHEET_SWOT, cell: 'F24' },
+  sw_weakness3: { sheet: SHEET_SWOT, cell: 'F25' },
   sw_opportunity1: { sheet: SHEET_SWOT, cell: 'H23' },
   sw_opportunity2: { sheet: SHEET_SWOT, cell: 'H24' },
   sw_opportunity3: { sheet: SHEET_SWOT, cell: 'H25' },
-  sw_threat1:      { sheet: SHEET_SWOT, cell: 'J23' },
-  sw_threat2:      { sheet: SHEET_SWOT, cell: 'J24' },
-  sw_threat3:      { sheet: SHEET_SWOT, cell: 'J25' },
-  ai_choice:       { sheet: SHEET_WELCOME, cell: 'C12' },
+  sw_threat1: { sheet: SHEET_SWOT, cell: 'J23' },
+  sw_threat2: { sheet: SHEET_SWOT, cell: 'J24' },
+  sw_threat3: { sheet: SHEET_SWOT, cell: 'J25' },
+  ai_choice: { sheet: SHEET_WELCOME, cell: 'C12' },
 };
 
 const AI_OPTIONS = [
   { key: 'ChatGPT', label: 'ChatGPT', base: 'https://chatgpt.com/?q=' },
-  { key: 'Claude',  label: 'Claude',  base: 'https://claude.ai/new?q=' },
-  { key: 'Gemini',  label: 'Gemini (AI Studio)', base: 'https://aistudio.google.com/app/prompts/new_chat?prompt=' },
-  { key: 'Manus',   label: 'Manus',   base: 'https://manus.im/?q=' },
+  { key: 'Claude', label: 'Claude', base: 'https://claude.ai/new?q=' },
+  { key: 'Gemini', label: 'Gemini (AI Studio)', base: 'https://aistudio.google.com/app/prompts/new_chat?prompt=' },
+  { key: 'Manus', label: 'Manus', base: 'https://manus.im/?q=' },
 ];
 
 const MBTI_OPTIONS = Object.keys(MBTI_INFO);
 const VIA_LABEL_ID = {
-  creativity:'Kreativitas', curiosity:'Rasa Ingin Tahu', judgment:'Berpikir Kritis',
-  loveoflearning:'Cinta Belajar', perspective:'Perspektif (Kebijaksanaan)', bravery:'Keberanian',
-  perseverance:'Ketekunan', honesty:'Kejujuran', zest:'Semangat', love:'Cinta',
-  kindness:'Kebaikan Hati', socialintelligence:'Kecerdasan Sosial', teamwork:'Kerja Sama Tim',
-  fairness:'Keadilan', leadership:'Kepemimpinan', forgiveness:'Pemaaf', humility:'Kerendahan Hati',
-  prudence:'Kehati-hatian', selfregulation:'Pengaturan Diri', appreciationofbeauty:'Apresiasi Keindahan',
-  gratitude:'Rasa Syukur', hope:'Harapan', humor:'Humor', spirituality:'Spiritualitas',
+  creativity: 'Kreativitas', curiosity: 'Rasa Ingin Tahu', judgment: 'Berpikir Kritis',
+  loveoflearning: 'Cinta Belajar', perspective: 'Perspektif (Kebijaksanaan)', bravery: 'Keberanian',
+  perseverance: 'Ketekunan', honesty: 'Kejujuran', zest: 'Semangat', love: 'Cinta',
+  kindness: 'Kebaikan Hati', socialintelligence: 'Kecerdasan Sosial', teamwork: 'Kerja Sama Tim',
+  fairness: 'Keadilan', leadership: 'Kepemimpinan', forgiveness: 'Pemaaf', humility: 'Kerendahan Hati',
+  prudence: 'Kehati-hatian', selfregulation: 'Pengaturan Diri', appreciationofbeauty: 'Apresiasi Keindahan',
+  gratitude: 'Rasa Syukur', hope: 'Harapan', humor: 'Humor', spirituality: 'Spiritualitas',
 };
 const VIA_OPTIONS = Object.keys(VIA_INFO).map(k => ({ key: k, label: VIA_LABEL_ID[k] || k }));
 
@@ -1174,8 +1174,8 @@ function getSetupData_(userSpreadsheet) {
 
   return {
     context: { name: g('D4'), major: g('D5'), semester: g('D6'), linear: g('D7') },
-    semesterOptions: getValidationOptions_(ik, 6, 4, ['Semester 1','Semester 2','Semester 3','Semester 4','Semester 5','Semester 6','Semester 7','Semester 8']),
-    linearOptions: getValidationOptions_(ik, 7, 4, ['YA','TIDAK']),
+    semesterOptions: getValidationOptions_(ik, 6, 4, ['Semester 1', 'Semester 2', 'Semester 3', 'Semester 4', 'Semester 5', 'Semester 6', 'Semester 7', 'Semester 8']),
+    linearOptions: getValidationOptions_(ik, 7, 4, ['YA', 'TIDAK']),
     ikigai: {
       mbti: g('C13'),
       via: [g('D14'), g('E14'), g('F14')],

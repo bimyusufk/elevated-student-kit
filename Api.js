@@ -95,7 +95,7 @@ function doPost(e) {
         result = verifyWebAppUrl();
         break;
       case "activateWithToken":
-        result = activateWithToken(userSpreadsheet, payload.inputToken || payload.code || token, userInfo);
+        result = activateWithTokenApi_(userSpreadsheet, payload.inputToken || payload.code || token, userInfo);
         break;
       case "getActivationStatus":
         result = getActivationStatus(userSpreadsheet);
@@ -139,7 +139,7 @@ function getActivationsSpreadsheet_() {
 /**
  * Helper: Penanganan aksi 'activateWithToken' dari Vercel
  */
-function activateWithToken(userSpreadsheet, inputToken, userInfo) {
+function activateWithTokenApi_(userSpreadsheet, inputToken, userInfo) {
   var code = inputToken || (userInfo ? userInfo.code : '');
   try {
     if (userSpreadsheet) {
