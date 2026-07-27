@@ -49,29 +49,60 @@ function getTokenInSheet_() {
  * (auto-recheck tiap buka dashboard/spreadsheet).
  */
 function validateAgainstRumahA_(email, code) {
-  if (!email) return { valid: false, error: 'Email akun Google nggak terdeteksi. Pastikan kamu login pakai akun Google yang sama dengan waktu pembelian.' };
-  if (!code) return { valid: false, error: 'Token aktivasi belum diisi.' };
+  Logger.log('[DEBUG] Memulai validateAgainstRumahA_');
+  Logger.log('[DEBUG] Parameter - Email: ' + email + ', Code: ' + code);
+
+  if (!email) {
+    Logger.log('[DEBUG] Error: Email kosong.');
+    return { valid: false, error: 'Email akun Google nggak terdeteksi. Pastikan kamu login pakai akun Google yang sama dengan waktu pembelian.' };
+  }
+  if (!code) {
+    Logger.log('[DEBUG] Error: Code kosong.');
+    return { valid: false, error: 'Token aktivasi belum diisi.' };
+  }
 
   const secret = PropertiesService.getScriptProperties().getProperty('VALIDATE_SECRET');
-  if (!secret) return { valid: false, error: 'Konfigurasi belum lengkap (VALIDATE_SECRET). Hubungi admin.' };
+  if (!secret) {
+    Logger.log('[DEBUG] Error: VALIDATE_SECRET belum diset.');
+    return { valid: false, error: 'Konfigurasi belum lengkap (VALIDATE_SECRET). Hubungi admin.' };
+  }
 
+  Logger.log('[DEBUG] Payload yang akan dikirim: ' + JSON.stringify({ action: 'validate', email: email, code: code, secret: '***' }));
   const payload = { action: 'validate', secret: secret, email: email, code: code };
   let response;
   try {
+    Logger.log('[DEBUG] URL Tujuan: ' + RUMAH_A_URL);
     response = UrlFetchApp.fetch(RUMAH_A_URL, {
       method: 'post', contentType: 'application/json',
       payload: JSON.stringify(payload), muteHttpExceptions: true
     });
+    Logger.log('[DEBUG] HTTP Status Code: ' + response.getResponseCode());
+    Logger.log('[DEBUG] Raw Response: ' + response.getContentText());
   } catch (err) {
+    Logger.log('[DEBUG] Exception saat UrlFetchApp: ' + err.message);
     return { valid: false, error: 'Gagal menghubungi server lisensi: ' + err.message };
   }
 
   let result;
-  try { result = JSON.parse(response.getContentText()); }
-  catch (err) { return { valid: false, error: 'Respons server lisensi tidak valid.' }; }
+  try { 
+    result = JSON.parse(response.getContentText()); 
+    Logger.log('[DEBUG] Parsed JSON Response: ' + JSON.stringify(result));
+  }
+  catch (err) { 
+    Logger.log('[DEBUG] Gagal parse JSON response.');
+    return { valid: false, error: 'Respons server lisensi tidak valid.' }; 
+  }
 
-  if (result.error) return { valid: false, error: result.error };
-  if (!result.valid) return { valid: false, error: result.reason || 'Token tidak valid untuk akun ini.' };
+  if (result.error) {
+    Logger.log('[DEBUG] Ditolak oleh server, error: ' + result.error);
+    return { valid: false, error: result.error };
+  }
+  if (!result.valid) {
+    Logger.log('[DEBUG] Ditolak oleh server, invalid reason: ' + (result.reason || 'Token tidak valid'));
+    return { valid: false, error: result.reason || 'Token tidak valid untuk akun ini.' };
+  }
+  
+  Logger.log('[DEBUG] Validasi Sukses!');
   return { valid: true, produk: result.produk || '' };
 }
 
@@ -184,20 +215,31 @@ function getActivationStatus() {
  * Email diambil dari SESI LOGIN AKTIF.
  */
 function activateWithToken(inputToken) {
+  Logger.log('[DEBUG] Memulai activateWithToken dengan input: ' + inputToken);
   const email = Session.getActiveUser().getEmail();
   const code = String(inputToken || '').trim().toUpperCase() || getTokenInSheet_();
+  Logger.log('[DEBUG] Deteksi Email: ' + email + ', Code: ' + code);
 
   const result = validateAgainstRumahA_(email, code);
+  Logger.log('[DEBUG] Hasil dari validateAgainstRumahA_: ' + JSON.stringify(result));
+  
   if (!result.valid) {
+    Logger.log('[DEBUG] Aktivasi dibatalkan karena validasi gagal.');
     return { success: false, error: result.error };
   }
 
   try {
     const sheet = getSS_().getSheetByName(SHEET_WELCOME);
-    if (sheet) sheet.getRange(WELCOME_CODE_CELL).setValue(code);
-  } catch (e) { /* non-fatal, jangan gagalin aktivasi cuma gara-gara ini */ }
+    if (sheet) {
+      sheet.getRange(WELCOME_CODE_CELL).setValue(code);
+      Logger.log('[DEBUG] Berhasil menulis token ke sheet WELCOME.');
+    }
+  } catch (e) { 
+    Logger.log('[DEBUG] Exception saat menulis ke sheet WELCOME: ' + e.message);
+  }
 
   setActivatedState_(true, email, code);
+  Logger.log('[DEBUG] setActivatedState_(true) berhasil dipanggil.');
   return { success: true, produk: result.produk };
 }
 
