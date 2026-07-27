@@ -15,7 +15,7 @@ const SHEET_WELCOME = 'WELCOME';
 // ============================================================
 // GERBANG AKTIVASI
 // ============================================================
-const RUMAH_A_URL = 'https://script.google.com/macros/s/AKfycbwSO7yK3eU-8eeOzKoVfx-EN4P0krysLfkSbotbJimBhHFhz0gQSZwSQN-iRcC-4IUoCA/exec';
+const RUMAH_A_URL = 'https://script.google.com/macros/s/AKfycbzK2KIZk2_EnEHLFs_a3ABBNksuBfeLw-suE5w3xDZHAVCyH-1fWZF6XEGr7qG1RHqA/exec';
 const WELCOME_CODE_CELL = 'G23'; // cell token di tab WELCOME (merged G23:H24)
 const PROP_ACTIVATED = 'ikigai_activated';
 const PROP_ACTIVATED_EMAIL = 'ikigai_activated_email';
