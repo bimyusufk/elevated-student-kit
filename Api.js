@@ -95,7 +95,7 @@ function doPost(e) {
         result = verifyWebAppUrl();
         break;
       case "activateWithToken":
-        result = activateWithToken(userSpreadsheet, payload.inputToken);
+        result = activateWithToken(userSpreadsheet, payload.inputToken || payload.code || token, userInfo);
         break;
       case "getActivationStatus":
         result = getActivationStatus(userSpreadsheet);
@@ -124,24 +124,58 @@ function doPost(e) {
 }
 
 /**
+ * Helper: Ambil spreadsheet Activations (otomatis jika container-bound atau via ID)
+ */
+function getActivationsSpreadsheet_() {
+  try {
+    var active = SpreadsheetApp.getActiveSpreadsheet();
+    if (active && active.getSheetByName("Activations")) {
+      return active;
+    }
+  } catch (e) {}
+  return SpreadsheetApp.openById("1OkbFWqAdQmO_R2aoyH2i9cQ6QOf3t4HmcEnis021BWc");
+}
+
+/**
+ * Helper: Penanganan aksi 'activateWithToken' dari Vercel
+ */
+function activateWithToken(userSpreadsheet, inputToken, userInfo) {
+  var code = inputToken || (userInfo ? userInfo.code : '');
+  try {
+    if (userSpreadsheet) {
+      var sheet = userSpreadsheet.getSheetByName("WELCOME");
+      if (sheet) {
+        sheet.getRange("G23").setValue(code);
+      }
+    }
+  } catch (e) {
+    Logger.log("Error writing token to WELCOME: " + e.toString());
+  }
+
+  return {
+    success: true,
+    produk: (userInfo && userInfo.produk) ? userInfo.produk : "ElevatEd Student Kit"
+  };
+}
+
+/**
  * Helper: Penanganan aksi 'validate' lisensi dari Rumah B / Dashboard
  */
 function handleValidateAction_(data) {
   var secret = data.secret;
   var email = data.email;
-  var code = data.code || data.token;
+  var code = String(data.code || data.token || '').trim().toUpperCase();
 
   var expectedSecret = PropertiesService.getScriptProperties().getProperty('VALIDATE_SECRET') || "ikg_valid_z4Tn9wRfB7cJ";
   if (secret !== expectedSecret) {
     return { valid: false, reason: "Secret key tidak cocok." };
   }
 
-  var activationsSpreadsheetId = "MASUKKAN_ACTIVATIONS_SPREADSHEET_ID_DI_SINI";
-  var sheet = SpreadsheetApp.openById(activationsSpreadsheetId).getSheetByName("Activations");
+  var sheet = getActivationsSpreadsheet_().getSheetByName("Activations");
   var rows = sheet.getDataRange().getValues();
 
   for (var i = 1; i < rows.length; i++) {
-    var rowCode = String(rows[i][6] || '').trim(); // Indeks 6 (Kolom G - Code)
+    var rowCode = String(rows[i][6] || '').trim().toUpperCase(); // Indeks 6 (Kolom G - Code)
     var rowEmail = String(rows[i][3] || '').trim(); // Indeks 3 (Kolom D - Email)
     var rowStatus = String(rows[i][7] || '').trim().toLowerCase(); // Indeks 7 (Kolom H - Status)
 
@@ -149,7 +183,7 @@ function handleValidateAction_(data) {
       if (rowStatus !== 'aktif') {
         return { valid: false, reason: 'Lisensi/token ini sudah tidak aktif.' };
       }
-      if (rowEmail.toLowerCase() !== email.toLowerCase()) {
+      if (email && rowEmail.toLowerCase() !== String(email).toLowerCase()) {
         return { valid: false, reason: 'Token ini tidak terdaftar untuk email Google ' + email };
       }
       return { valid: true, produk: rows[i][5] || '' };
@@ -162,17 +196,23 @@ function handleValidateAction_(data) {
  * Helper: Cari data user di sheet 'activations' berdasarkan token
  */
 function getUserInfoByToken_(token) {
-  var activationsSpreadsheetId = "MASUKKAN_ACTIVATIONS_SPREADSHEET_ID_DI_SINI";
-  var sheet = SpreadsheetApp.openById(activationsSpreadsheetId).getSheetByName("Activations");
+  if (!token) return null;
+  var cleanToken = String(token).trim().toUpperCase();
+  var sheet = getActivationsSpreadsheet_().getSheetByName("Activations");
+  if (!sheet) return null;
   var rows = sheet.getDataRange().getValues();
   
-  // Asumsi kolom: [0] No, [1] Timestamp, [2] Nama, [3] Email, [4] Whatsapp, [5] Produk, [6] Code, [7] Status
+  // Asumsi kolom: [0] No, [1] Timestamp, [2] Nama, [3] Email, [4] Whatsapp, [5] Produk, [6] Code, [7] Status, [8] Spreadsheet ID
   for (var i = 1; i < rows.length; i++) {
-    var rowCode = String(rows[i][6] || '').trim(); // Kolom Code (indeks 6 / Kolom G)
-    if (rowCode === token && String(rows[i][7] || '').trim().toLowerCase() === "aktif") {
+    var rowCode = String(rows[i][6] || '').trim().toUpperCase(); // Kolom Code (indeks 6 / Kolom G)
+    var rowStatus = String(rows[i][7] || '').trim().toLowerCase(); // Kolom Status (indeks 7 / Kolom H)
+    if (rowCode === cleanToken && rowStatus === "aktif") {
       return {
+        nama: rows[i][2],
         email: rows[i][3],
-        spreadsheetId: rows[i][8] // Kolom tempat Anda menyimpan Spreadsheet ID user (Indeks 8 / Kolom I)
+        produk: rows[i][5] || "ElevatEd Student Kit",
+        code: rows[i][6],
+        spreadsheetId: String(rows[i][8] || '').trim() // Kolom tempat Anda menyimpan Spreadsheet ID user (Indeks 8 / Kolom I)
       };
     }
   }
