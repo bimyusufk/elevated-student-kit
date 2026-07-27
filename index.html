@@ -2346,6 +2346,7 @@
             showLoad(false);
             try { console.error('[ElevatEd fatal]', msg); } catch (e) { }
         }
+        const onFatal = showFatal;
         document.getElementById('fatal-close').addEventListener('click', () => {
             document.getElementById('fatal-banner').classList.remove('show');
         });

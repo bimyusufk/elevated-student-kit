@@ -521,6 +521,7 @@ function getBundle(userSpreadsheet) {
   const dream = getDreamPlan_(userSpreadsheet);
   const college = getCollegePlan_(userSpreadsheet);
   return {
+    success: true,
     personal: getPersonal_(userSpreadsheet),
     dream, college,
     action: getActionPlan_(userSpreadsheet),
@@ -534,6 +535,7 @@ function getInitialBundle(userSpreadsheet) {
   const dream = getDreamPlan_(userSpreadsheet);
   const college = getCollegePlan_(userSpreadsheet);
   return {
+    success: true,
     personal: getPersonal_(userSpreadsheet),
     dream, college,
     gamification: getGamification_(userSpreadsheet, dream, college),
@@ -543,7 +545,7 @@ function getInitialBundle(userSpreadsheet) {
 }
 
 function getActionPlanOnly(userSpreadsheet) {
-  return { action: getActionPlan_(userSpreadsheet) };
+  return { success: true, action: getActionPlan_(userSpreadsheet) };
 }
 
 function semesterNum_(label) {
@@ -884,7 +886,7 @@ function getTrackerView(userSpreadsheet, quarter, cachedBlocks) {
     const values = newKeys.map(k => [k, false, false, false, false, false, false, false]);
     stateSheet.getRange(startRow, 1, values.length, 8).setValues(values);
   }
-  return { quarter, weeks, goals, startDate: start.toISOString() };
+  return { success: true, quarter, weeks, goals, startDate: start.toISOString() };
 }
 
 function toggleTrackerCheck2(userSpreadsheet, quarter, goalIdx, tacticNo, week, dayIndex, value, target, periodWeeks) {
@@ -947,7 +949,7 @@ function getGamification_(userSpreadsheet, dream, college) {
 
   return { total, badge, nextBadge, specialBadges, breakdown: { dream: dreamScore, college: collegeScore, tracker: trackerScore } };
 }
-function getGamificationOnly(userSpreadsheet) { return getGamification_(userSpreadsheet); }
+function getGamificationOnly(userSpreadsheet) { return Object.assign({ success: true }, getGamification_(userSpreadsheet)); }
 
 function getReportData_(userSpreadsheet) {
   const personal = getPersonal_(userSpreadsheet);
@@ -962,6 +964,7 @@ function getReportData_(userSpreadsheet) {
     .map(m => Object.assign({}, m, { overdue: semesterNum_(m.semester) < curNum && String(m.progress).toLowerCase().indexOf('tercapai') < 0 }));
 
   return {
+    success: true,
     personal, dreamEval, collegeEval, gamification,
     generatedAt: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMMM yyyy, HH:mm"),
     dreamDoneCount: dreamEval.filter(g => String(g.status).toLowerCase().indexOf('tercapai') >= 0).length,
@@ -1083,7 +1086,10 @@ function getIdentityReport_(userSpreadsheet) {
     generatedAt: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMMM yyyy"),
   };
 }
-function getIdentityBundle(userSpreadsheet) { return getIdentityReport_(userSpreadsheet); }
+function getIdentityBundle(userSpreadsheet) {
+  const data = getIdentityReport_(userSpreadsheet);
+  return data ? Object.assign({ success: true }, data) : { success: false, error: 'Data identity tidak ditemukan' };
+}
 
 // ============================================================
 // SETUP — wizard pengisian Ikigai & SWOT
@@ -1195,7 +1201,10 @@ function getSetupData_(userSpreadsheet) {
     viaOptions: VIA_OPTIONS,
   };
 }
-function getSetupBundle(userSpreadsheet) { return getSetupData_(userSpreadsheet); }
+function getSetupBundle(userSpreadsheet) {
+  const data = getSetupData_(userSpreadsheet);
+  return data ? Object.assign({ success: true }, data) : { success: false, error: 'Setup data tidak ditemukan' };
+}
 
 function saveSetupField(userSpreadsheet, fieldKey, value) {
   try {
