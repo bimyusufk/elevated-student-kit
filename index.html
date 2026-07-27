@@ -1,0 +1,3440 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>ElevatEd Student Kit</title>
+
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='rgb(20,51,88)'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle'%3E%F0%9F%A6%89%3C/text%3E%3C/svg%3E">
+  <meta name="theme-color" content="#143358">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ElevatEd">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="google-site-verification" content="Kn4SzVN7sCpU99KLWL2HkY1VlRjzfBYgS7GvGUtOk3M" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;0,900;1,500&family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --navy: #143358;
+      --navy-lt: #2A5088;
+      --navy-deep: #0B1D33;
+      --crimson: #E62129;
+      --crimson-dim: #C81B24;
+      --gold: #E9A23B;
+      --gold-dim: #C97E1E;
+      --pop: #FFC845;
+      --pop-soft: #FFF3D2;
+      --paper: #FAF7F1;
+      --surface: #FFFFFF;
+      --surface-2: #E7ECF6;
+      --border: #143358;
+      --text: #17263A;
+      --muted: #6B7280;
+      --faint: #9CA6B4;
+      --ok: #1FA35A;
+      --radius: 18px;
+      --radius-sm: 13px;
+      --radius-pill: 999px;
+      --shadow-card: 0 1px 2px rgba(21, 16, 31, .05), 0 8px 20px -14px rgba(21, 16, 31, .18);
+      --shadow-navy: 4px 4px 0 var(--navy);
+      --shadow-gold: 4px 4px 0 var(--gold);
+      --shadow-crimson: 4px 4px 0 var(--crimson);
+      --shadow-pop: 4px 4px 0 var(--pop);
+      --font-display: 'Fraunces', serif;
+      --font-accent: 'Fraunces', serif;
+      --font-body: 'Montserrat', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --nav-h: 68px;
+      --sidebar-w: 216px;
+      --sidebar-w-collapsed: 76px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--paper);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+      font-size: 14px;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+
+    em,
+    .accent {
+      font-family: var(--font-accent);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--navy-lt);
+    }
+
+    ::selection {
+      background: var(--pop);
+      color: var(--navy);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px;
+      gap: 3px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      transition: width .22s ease, min-width .22s ease, padding .22s ease;
+      z-index: 100;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-w-collapsed);
+      min-width: var(--sidebar-w-collapsed);
+      padding: 20px 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 8px 18px;
+      margin-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .sidebar.collapsed .brand {
+      justify-content: center;
+      padding: 4px 0 18px;
+    }
+
+    .brand .mark-logo {
+      height: 32px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .sidebar.collapsed .brand .mark-logo {
+      display: none;
+    }
+
+    .brand .mark-badge {
+      display: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      background: var(--navy);
+      align-items: center;
+      justify-content: center;
+      color: var(--pop);
+      flex-shrink: 0;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 17px;
+      box-shadow: var(--shadow-navy);
+    }
+
+    .sidebar.collapsed .brand .mark-badge {
+      display: flex;
+    }
+
+    .brand .txt {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sidebar.collapsed .brand .txt {
+      display: none;
+    }
+
+    .brand b {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+    }
+
+    .brand b i {
+      font-family: var(--font-accent);
+      font-style: italic;
+      font-weight: 400;
+      color: var(--crimson);
+    }
+
+    .brand small {
+      display: block;
+      font-size: 9px;
+      color: var(--faint);
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      margin-top: 1px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 14px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 700;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: background .15s, color .15s, transform .1s;
+    }
+
+    .nav:hover {
+      background: var(--surface-2);
+      color: var(--navy);
+    }
+
+    .nav:active {
+      transform: scale(.97);
+    }
+
+    .nav.active {
+      background: var(--navy);
+      color: var(--pop);
+    }
+
+    .nav .ic {
+      width: 20px;
+      text-align: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .nav .lbl {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar.collapsed .nav {
+      justify-content: center;
+      padding: 11px 0;
+      gap: 0;
+    }
+
+    .sidebar.collapsed .nav .lbl {
+      display: none;
+    }
+
+    /* FIX (catatan #1/#9): tombol collapse sidebar sebelumnya position:absolute
+   DI DALAM .sidebar yang overflow-y:auto — karena browser otomatis nge-clip
+   overflow-x juga begitu overflow-y diset (bukan 'visible'), tombolnya
+   (right:-14px, nongol keluar box sidebar) ke-crop/ketutup. Sekarang tombol
+   dijadikan sibling .sidebar (lihat initSidebarCollapse di JS, di-insert
+   pakai insertAdjacentElement('afterend', ...)) dan position:fixed relatif
+   ke viewport, jadi selalu nongol paling depan & gak pernah ke-clip. */
+    .sidebar-toggle {
+      position: fixed;
+      top: 24px;
+      left: calc(var(--sidebar-w) - 14px);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--pop);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      box-shadow: 2px 2px 0 var(--pop);
+      z-index: 150;
+      transition: left .22s ease;
+      padding: 0;
+      font-family: var(--font-body);
+    }
+
+    .sidebar-toggle:active {
+      transform: scale(.92);
+    }
+
+    .sidebar.collapsed~.sidebar-toggle {
+      left: calc(var(--sidebar-w-collapsed) - 14px);
+    }
+
+    .sidebar.collapsed~.sidebar-toggle .arrow {
+      transform: rotate(180deg);
+    }
+
+    .sidebar-toggle .arrow {
+      display: inline-block;
+      transition: transform .22s ease;
+    }
+
+    .nav-external {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 2px dashed #E4DECF;
+      text-decoration: none;
+      display: none;
+    }
+
+    .nav-external.show {
+      display: flex;
+    }
+
+    .nav-external .ic {
+      color: var(--gold);
+    }
+
+    .nav-external:hover {
+      background: var(--pop-soft);
+      color: var(--navy);
+    }
+
+    .nav-external.ready {
+      background: var(--pop-soft);
+      color: var(--navy);
+    }
+
+    .nav-external.ready .ic {
+      color: var(--gold-dim);
+    }
+
+    .streak-chip {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 14px 7px 7px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-pill);
+      box-shadow: 3px 3px 0 var(--gold);
+    }
+
+    .streak-chip .bic {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+
+    .streak-chip .bname {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .streak-chip .bpts {
+      font-size: 9.5px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      min-height: 100dvh;
+      min-width: 0;
+      transition: margin-left .22s ease;
+    }
+
+    .sidebar.collapsed~.main {
+      margin-left: var(--sidebar-w-collapsed);
+    }
+
+    /* FIX (catatan #2): border-bottom biar pas discroll, konten yg lewat di
+   bawah topbar keliatan jelas batasnya (nggak nembus/kepotong polos)
+   karena sebelumnya warnanya nyatu sama background. */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--paper);
+      padding: calc(18px + var(--safe-top)) 26px 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .topbar h1 {
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -.02em;
+    }
+
+    .topbar .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      font-weight: 500;
+    }
+
+    .topbar .grow {
+      flex: 1;
+    }
+
+    .scroll {
+      padding: 14px 26px calc(40px + var(--safe-bottom));
+    }
+
+    .card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-card);
+    }
+
+    .pad {
+      padding: 20px;
+    }
+
+    .doc-wrap {}
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: 3px 3px 0 var(--accent, var(--navy));
+    }
+
+    .kpi .lbl {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-family: var(--font-mono);
+    }
+
+    .kpi .val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: 5px;
+      font-family: var(--font-display);
+      letter-spacing: -.01em;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 24px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .sec-head h2 {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -.01em;
+    }
+
+    .sec-head .grow {
+      flex: 1;
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      color: var(--navy-lt);
+      display: inline-block;
+      border: 1.5px solid transparent;
+    }
+
+    .chip.gold {
+      background: #FFF1D6;
+      color: #8A5A0F;
+      border-color: #F0D190;
+    }
+
+    .chip.crimson {
+      background: #FFE3DE;
+      color: var(--crimson-dim);
+      border-color: #FFC5BA;
+    }
+
+    .pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: var(--radius-pill);
+      display: inline-block;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .pill.tercapai {
+      background: #E1F7E9;
+      color: var(--ok);
+      border-color: #B8EAC9;
+    }
+
+    .pill.progress {
+      background: var(--surface-2);
+      color: var(--navy-lt);
+      border-color: #DACCFF;
+    }
+
+    .pill.gagal {
+      background: #FFE3DE;
+      color: var(--crimson-dim);
+      border-color: #FFC5BA;
+    }
+
+    .pill.default {
+      background: #F1EFF5;
+      color: var(--muted);
+      border-color: #E2DEEC;
+    }
+
+    .owl-quote {
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      padding: 26px 26px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 6px 6px 0 var(--pop);
+    }
+
+    .owl-quote::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -40px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(42, 80, 136, .45), transparent 70%);
+    }
+
+    .owl-quote::after {
+      content: '🦉';
+      position: absolute;
+      right: -4px;
+      bottom: -24px;
+      font-size: 110px;
+      opacity: .09;
+      transform: rotate(-8deg);
+    }
+
+    .owl-quote .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--pop);
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .owl-quote .role {
+      font-family: var(--font-accent);
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(23px, 4.5vw, 30px);
+      margin-top: 8px;
+      line-height: 1.18;
+      position: relative;
+      z-index: 1;
+    }
+
+    .owl-quote .line {
+      font-size: 13px;
+      color: #D9D2EE;
+      margin-top: 10px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .owl-quote .line b {
+      color: var(--pop);
+      font-weight: 700;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px 20px;
+    }
+
+    .kv .k {
+      font-size: 10px;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .kv .v {
+      font-size: 14.5px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    .swot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .swot-box {
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+    }
+
+    .swot-box.s {
+      background: #E1F7E9;
+    }
+
+    .swot-box.w {
+      background: #FFF1D6;
+    }
+
+    .swot-box.o {
+      background: var(--surface-2);
+    }
+
+    .swot-box.t {
+      background: #FFE3DE;
+    }
+
+    .swot-box .t-lbl {
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+    }
+
+    .swot-box ul {
+      padding-left: 16px;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .seg {
+      display: inline-flex;
+      gap: 3px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      flex-wrap: wrap;
+      max-width: 100%;
+      overflow-x: auto;
+      border: 1.5px solid #E2D9FF;
+    }
+
+    .seg button {
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font-body);
+      white-space: nowrap;
+    }
+
+    .seg button.active {
+      background: var(--navy);
+      color: var(--pop);
+    }
+
+    .seg button.disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    /* FIX (catatan #7): grid nyebar rata selebar box, bukan pill nempel kiri */
+    .week-pill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+      gap: 5px;
+      background: var(--surface-2);
+      padding: 5px;
+      border-radius: 14px;
+      border: 1.5px solid #E2D9FF;
+    }
+
+    .week-pill-grid button {
+      padding: 9px 4px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      text-align: center;
+    }
+
+    .week-pill-grid button.active {
+      background: var(--navy);
+      color: var(--pop);
+    }
+
+    .goal-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-left: 5px solid var(--navy-lt);
+      border-radius: var(--radius-sm);
+      padding: 15px 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .goal-card .gname {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--text);
+    }
+
+    .goal-card .gmeta {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* FIX (catatan #13): teks SMART goal dibikin font normal, bukan italic serif */
+    .goal-card .smart {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.5;
+      font-family: var(--font-body);
+      font-style: normal;
+    }
+
+    .tbl-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 480px;
+    }
+
+    .tbl th {
+      font-size: 10px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 700;
+      text-align: left;
+      padding: 11px 12px;
+      font-family: var(--font-mono);
+      background: var(--navy);
+    }
+
+    .tbl td {
+      padding: 12px;
+      font-size: 12.5px;
+      border-bottom: 2px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .tbl tr:nth-child(even) td {
+      background: var(--surface-2);
+    }
+
+    .tbl tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tactic-goal {
+      margin-bottom: 22px;
+    }
+
+    .tactic-goal .gname {
+      font-family: var(--font-display);
+      font-size: 16.5px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      padding: 9px 16px;
+      border-radius: var(--radius-pill);
+      border: 2px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-body);
+      transition: transform .1s;
+    }
+
+    .btn:active {
+      transform: scale(.96);
+    }
+
+    .btn.sm {
+      padding: 6px 11px;
+      font-size: 11px;
+    }
+
+    .btn.primary {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 3px 3px 0 var(--navy-lt);
+    }
+
+    .btn.gold {
+      background: var(--gold);
+      color: var(--navy);
+      box-shadow: 3px 3px 0 var(--navy);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border-color: #E2DEEC;
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .start-date-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-2);
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      flex-wrap: wrap;
+      border: 1.5px solid #E2D9FF;
+    }
+
+    .start-date-box input {
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .week-hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin: 14px 0 12px;
+      box-shadow: 4px 4px 0 var(--navy-lt);
+    }
+
+    .week-hero .wk-num {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--navy);
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .week-hero .wk-label {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--navy);
+    }
+
+    .week-hero .wk-range {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+
+    .tk-task {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 16px;
+      margin-bottom: 12px;
+    }
+
+    .tk-task:not(:last-child) {
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tk-task-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+      flex-wrap: wrap;
+    }
+
+    .tk-task-top .tname {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 160px;
+    }
+
+    .tk-days {
+      display: flex;
+      gap: 5px;
+      flex-wrap: nowrap;
+    }
+
+    .day-box {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 44px;
+      aspect-ratio: 1;
+      border-radius: 9px;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--faint);
+      cursor: pointer;
+      flex-direction: column;
+      transition: all .12s;
+      user-select: none;
+      background: var(--surface);
+    }
+
+    .day-box .dlbl {
+      font-size: 7.5px;
+    }
+
+    .day-box.checked {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--pop);
+    }
+
+    .day-box.lockedday {
+      cursor: not-allowed;
+      opacity: .35;
+    }
+
+    .day-box:not(.lockedday):hover {
+      border-color: var(--navy-lt);
+    }
+
+    .bar {
+      height: 8px;
+      background: var(--surface-2);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 9px;
+      border: 1.5px solid #E2D9FF;
+    }
+
+    .bar>i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--crimson));
+      border-radius: 20px;
+      transition: width .2s;
+    }
+
+    .week-range {
+      font-size: 11px;
+      color: var(--faint);
+      font-family: var(--font-mono);
+      margin-left: 8px;
+    }
+
+    .tk-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .report-cover {
+      background: var(--navy);
+      color: #fff;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      padding: clamp(24px, 5vw, 34px);
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 6px 6px 0 var(--crimson);
+    }
+
+    .report-cover::after {
+      content: '';
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 241, 59, .18), transparent 70%);
+    }
+
+    .report-cover .tag {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--pop);
+      font-weight: 700;
+    }
+
+    .report-cover h1 {
+      font-size: clamp(24px, 5vw, 30px);
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .report-cover .meta {
+      font-size: 12.5px;
+      color: #D5CCEC;
+      margin-top: 10px;
+      line-height: 1.7;
+    }
+
+    .report-cover .meta b {
+      color: #fff;
+    }
+
+    .report-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 26px;
+    }
+
+    .report-kpi {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .report-kpi .n {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .report-kpi .l {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 700;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .report-section {
+      margin-bottom: 26px;
+    }
+
+    .report-section .sh {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--navy);
+    }
+
+    .report-section .sh h3 {
+      font-size: 15px;
+      color: var(--navy);
+    }
+
+    .report-section .sh .count {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .rtbl {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+    }
+
+    .rtbl th {
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: #fff;
+      text-align: left;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      background: var(--navy);
+    }
+
+    .rtbl td {
+      padding: 10px;
+      font-size: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .rtbl tr:nth-child(even) td {
+      background: var(--surface-2);
+    }
+
+    .rtbl tr.overdue td:first-child {
+      border-left: 4px solid var(--crimson);
+    }
+
+    .rtbl tr.overdue td {
+      background: #FFF1EE;
+    }
+
+    .report-footer {
+      font-size: 10.5px;
+      color: var(--faint);
+      text-align: center;
+      margin-top: 30px;
+      font-family: var(--font-mono);
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+      gap: 10px;
+    }
+
+    .badge-cell {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      background: var(--surface);
+    }
+
+    .badge-cell .bic {
+      font-size: 26px;
+    }
+
+    .badge-cell .bn {
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .badge-cell .bd {
+      font-size: 9.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .id-strengths li,
+    .id-weak li {
+      margin-left: 16px;
+      font-size: 12.5px;
+      line-height: 1.8;
+    }
+
+    .exec-summary {
+      margin-bottom: 20px;
+    }
+
+    .es-block {
+      display: flex;
+      gap: 14px;
+      padding: 16px 0;
+    }
+
+    .es-block:not(:last-child) {
+      border-bottom: 2px dashed var(--surface-2);
+    }
+
+    .es-num {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--pop);
+      color: var(--navy);
+      font-family: var(--font-display);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border: 2px solid var(--border);
+    }
+
+    .es-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .es-body p {
+      font-size: 13px;
+      line-height: 1.65;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .es-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .es-body ul {
+      padding-left: 18px;
+      margin-bottom: 10px;
+    }
+
+    .es-body li {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .es-body ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .tk-goal-wrap {
+      border: 2px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 20px;
+      background: var(--paper);
+    }
+
+    .tk-goal-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 14px;
+      padding: 13px 16px;
+      margin-bottom: 14px;
+      box-shadow: 4px 4px 0 var(--pop);
+    }
+
+    .tk-goal-heading .gh-ic {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--navy-lt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .tk-goal-heading .gh-text {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 7, 20, .6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      padding: 20px;
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      border: 2px solid var(--border);
+      padding: 24px;
+      width: 440px;
+      max-width: 100%;
+      max-height: 86vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      box-shadow: 8px 8px 0 var(--navy-lt);
+    }
+
+    /* FIX (catatan #4): modal kalender dilebarin biar gak sempit */
+    .modal.wide {
+      width: 600px;
+    }
+
+    .input {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      width: 100%;
+    }
+
+    /* FIX (catatan #4): grid rata kiri-kanan selebar kolom lain (title/textarea),
+   bukan flex-wrap yg numpuk kiri sisa kosong di kanan */
+    .day-pick {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .day-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--surface-2);
+      border-radius: 10px;
+      padding: 7px 4px;
+      cursor: pointer;
+      border: 1.5px solid #E2D9FF;
+    }
+
+    .day-pill input {
+      accent-color: var(--navy);
+    }
+
+    .day-pill.sm {
+      padding: 5px 3px;
+      font-size: 9px;
+    }
+
+    .day-pill:has(input:checked) {
+      background: var(--navy);
+      color: var(--pop);
+    }
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 248, 236, .85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .loading.on {
+      display: flex;
+    }
+
+    .spin {
+      width: 22px;
+      height: 22px;
+      border: 3px solid var(--border);
+      border-top-color: var(--navy-lt);
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: calc(20px + var(--nav-h) + var(--safe-bottom));
+      right: 20px;
+      background: var(--navy);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 400;
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+      box-shadow: 3px 3px 0 var(--pop);
+    }
+
+    .toast.on {
+      opacity: 1;
+    }
+
+    .empty {
+      color: var(--faint);
+      font-size: 12.5px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .fatal-banner {
+      display: none;
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: calc(16px + var(--nav-h) + var(--safe-bottom));
+      z-index: 900;
+      background: #fff;
+      border: 2px solid var(--crimson);
+      border-left: 6px solid var(--crimson);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 5px 5px 0 var(--crimson);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .fatal-banner.show {
+      display: block;
+    }
+
+    .fatal-banner .ft {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--crimson-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .fatal-banner .fd {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .fatal-banner .fx {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      color: var(--faint);
+    }
+
+    /* ============================================================
+   PATCH MOBILE — tabel jadi kartu bertumpuk (label:value) di layar
+   sempit, BUKAN sekadar tabel di-scroll horizontal. Semua tombol,
+   select, onclick di dalamnya TIDAK berubah — cuma <td> nambah
+   atribut data-label (lihat perubahan JS di bawah).
+   ============================================================ */
+    @media(max-width:680px) {
+      .tbl-wrap {
+        overflow-x: visible;
+      }
+
+      .tbl,
+      .rtbl {
+        display: block;
+        min-width: 0;
+      }
+
+      .tbl thead,
+      .rtbl thead {
+        display: none;
+      }
+
+      .tbl tbody,
+      .rtbl tbody {
+        display: block;
+      }
+
+      .tbl tr,
+      .rtbl tr {
+        display: block;
+        background: var(--surface);
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-card);
+      }
+
+      .tbl tr:nth-child(even) td,
+      .rtbl tr:nth-child(even) td {
+        background: transparent;
+      }
+
+      .tbl td,
+      .rtbl td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px dashed var(--surface-2);
+        text-align: right;
+      }
+
+      .tbl td:last-child,
+      .rtbl td:last-child {
+        border-bottom: none;
+      }
+
+      .tbl td::before,
+      .rtbl td::before {
+        content: attr(data-label);
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--faint);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        font-family: var(--font-mono);
+        text-align: left;
+        flex-shrink: 0;
+      }
+
+      .rtbl tr.overdue {
+        border-left: 4px solid var(--crimson);
+        background: #FFF1EE;
+      }
+
+      .rtbl tr.overdue td:first-child {
+        border-left: none;
+      }
+    }
+
+    @media (max-width:899px) {
+      body {
+        padding-bottom: calc(var(--nav-h) + var(--safe-bottom));
+      }
+
+      .sidebar {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        min-width: 0;
+        height: var(--nav-h);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2px;
+        padding: 6px 6px calc(6px + var(--safe-bottom));
+        border-right: none;
+        border-top: 2px solid var(--border);
+        z-index: 200;
+        overflow-x: auto;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .sidebar.collapsed {
+        width: auto;
+        min-width: 0;
+        padding: 6px 6px calc(6px + var(--safe-bottom));
+      }
+
+      .sidebar-toggle {
+        display: none;
+      }
+
+      .nav-external {
+        margin-top: 0;
+        padding-top: 6px;
+        border-top: none;
+      }
+
+      .brand {
+        display: none;
+      }
+
+      .nav {
+        flex-direction: column;
+        gap: 2px;
+        padding: 6px 4px;
+        border-radius: 14px;
+        flex: 1;
+        min-width: 56px;
+        font-size: 9.5px;
+      }
+
+      .sidebar.collapsed .nav {
+        flex-direction: column;
+        padding: 6px 4px;
+        gap: 2px;
+      }
+
+      .sidebar.collapsed .nav .lbl {
+        display: block;
+      }
+
+      .nav .ic {
+        font-size: 19px;
+      }
+
+      .nav .lbl {
+        font-size: 9px;
+        letter-spacing: -.01em;
+      }
+
+      .main,
+      .sidebar.collapsed~.main {
+        margin-left: 0;
+        min-height: 0;
+      }
+
+      .scroll {
+        padding: 14px 16px 24px;
+      }
+
+      .topbar {
+        padding: calc(14px + var(--safe-top)) 16px 10px;
+      }
+
+      .kpi .val {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width:520px) {
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .report-kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .nav .lbl {
+        display: none;
+      }
+
+      .nav {
+        min-width: 44px;
+      }
+
+      .day-box .dlbl {
+        display: none;
+      }
+
+      .week-hero {
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width:899px) and (orientation:landscape) and (max-height:500px) {
+      :root {
+        --nav-h: 52px;
+      }
+
+      .nav {
+        flex-direction: row;
+        gap: 6px;
+      }
+
+      .nav .lbl {
+        font-size: 10px;
+      }
+    }
+
+    /* FIX (catatan #8 & #11): waktu print/save-as-PDF, .main sebelumnya masih
+   ke-dorong margin-left:216px padahal sidebarnya udah disembunyikan — bikin
+   hasil print keliatan "kepotong". Sekarang margin di-nolin waktu print.
+   Spacing report/identity juga dipadetin biar gak jomplang jauh2 (#11). */
+    @media print {
+
+      .sidebar,
+      .loading,
+      .toast,
+      .no-print,
+      .overlay,
+      .fatal-banner,
+      .sidebar-toggle {
+        display: none !important;
+      }
+
+      body,
+      html {
+        height: auto !important;
+        overflow: visible !important;
+        background: #fff !important;
+      }
+
+      .main {
+        margin-left: 0 !important;
+      }
+
+      .topbar {
+        display: none !important;
+      }
+
+      .scroll {
+        overflow: visible !important;
+        height: auto !important;
+        padding: 0 !important;
+      }
+
+      .view {
+        display: none !important;
+      }
+
+      body.printing-report #view-report {
+        display: block !important;
+      }
+
+      body.printing-identity #view-identity {
+        display: block !important;
+      }
+
+      .card {
+        box-shadow: none !important;
+      }
+
+      .report-section {
+        margin-bottom: 14px;
+        break-inside: avoid;
+      }
+
+      .report-section .sh {
+        margin-bottom: 6px;
+        padding-bottom: 5px;
+      }
+
+      .es-block {
+        padding: 9px 0;
+      }
+
+      .card.pad {
+        padding: 13px;
+      }
+
+      .report-cover {
+        padding: 18px;
+        margin-bottom: 12px;
+      }
+
+      .report-kpi-row {
+        margin-bottom: 14px;
+        gap: 8px;
+      }
+
+      .report-cover::after {
+        display: none;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+    }
+
+    /* Pie chart overview (catatan #15) */
+    .dream-donut-wrap {
+      display: flex;
+      gap: 22px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .dream-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .dream-legend .li {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dream-legend .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* ── SETUP (Ikigai & SWOT wizard) ── */
+    .setup-diri-card {
+      background: var(--navy);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 4px 4px 0 var(--pop);
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+
+    .setup-diri-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media(max-width:900px) {
+      .setup-diri-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .setup-diri-card label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--pop);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-family: var(--font-mono);
+      margin-bottom: 5px;
+    }
+
+    .setup-diri-card .input {
+      background: #fff;
+    }
+
+    .setup-diri-card .ai-field {
+      background: var(--pop-soft);
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 2px solid var(--pop);
+    }
+
+    .setup-diri-card .ai-field label {
+      color: var(--navy);
+    }
+
+    .setup-diri-card .ai-field select.input {
+      border-color: var(--navy);
+      font-weight: 700;
+      background: var(--pop);
+    }
+
+    .setup-block {
+      margin-bottom: 16px;
+    }
+
+    .setup-block+.setup-block {
+      border-top: 2px dashed var(--border);
+      padding-top: 16px;
+    }
+
+    .setup-block-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 10px;
+    }
+
+    .setup-block-title .num {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background: var(--navy);
+      color: var(--pop);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .setup-field {
+      margin-bottom: 12px;
+    }
+
+    .setup-field label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-family: var(--font-mono);
+      margin-bottom: 5px;
+    }
+
+    .setup-grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    @media(max-width:680px) {
+      .setup-grid3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .swot-grid4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    @media(max-width:900px) {
+      .swot-grid4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:560px) {
+      .swot-grid4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .swot-col-head {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 6px 0;
+      margin-bottom: 8px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    .swot-col-head.s {
+      background: #DFF6E4;
+      color: #1FA35A;
+    }
+
+    .swot-col-head.w {
+      background: #FFE3DE;
+      color: #D8492E;
+    }
+
+    .swot-col-head.o {
+      background: #E2ECFF;
+      color: #3C64C8;
+    }
+
+    .swot-col-head.t {
+      background: #FFF0CC;
+      color: #B37C0A;
+    }
+
+    .ai-link-cta {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 12.5px;
+      background: var(--pop);
+      color: var(--navy);
+      border: 2px solid var(--border);
+      box-shadow: 3px 3px 0 var(--navy);
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .ai-link-cta.disabled {
+      background: var(--surface-2);
+      color: var(--muted);
+      box-shadow: none;
+      cursor: default;
+      border-style: dashed;
+    }
+
+    .skill-item {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: var(--surface-2);
+    }
+
+    .skill-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-item b {
+      font-size: 12.5px;
+      color: var(--navy);
+    }
+
+    .skill-item .note {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.5;
+    }
+
+    .career-skill-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media(max-width:680px) {
+      .career-skill-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── ACTIVATION SCREEN ── selector di-scope ke .activation-screen biar
+   gak nimpa style global dashboard (body/h1/input/button dipakai di
+   mana-mana di dashboard). */
+    .activation-page {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .activation-screen {
+      width: 100%;
+      max-width: 380px;
+      padding: 28px 26px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-navy);
+    }
+
+    .activation-screen h1 {
+      font-family: var(--font-body);
+      font-size: 19px;
+      color: var(--navy);
+      margin-bottom: 6px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .activation-screen .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .activation-screen label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 5px;
+    }
+
+    .activation-screen input {
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 9px;
+      padding: 11px 13px;
+      font-size: 15px;
+      letter-spacing: .06em;
+      text-align: center;
+      margin-bottom: 14px;
+      font-family: var(--font-mono);
+    }
+
+    .activation-screen input:focus {
+      outline: none;
+      border-color: var(--navy-lt);
+    }
+
+    .activation-screen button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: var(--navy);
+      color: var(--pop);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+
+    .activation-screen button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .activation-screen .msg {
+      margin-top: 12px;
+      font-size: 12px;
+      padding: 9px 11px;
+      border-radius: 9px;
+      display: none;
+      text-align: center;
+    }
+
+    .activation-screen .msg.err {
+      background: #FFE3DE;
+      color: #C81B24;
+      display: block;
+    }
+
+    .activation-screen .msg.ok {
+      background: #E1F7E9;
+      color: #1FA35A;
+      display: block;
+    }
+
+    .activation-screen .closebtn {
+      margin-top: 10px;
+      background: transparent;
+      color: var(--navy);
+      border-color: #E2DEEC;
+    }
+
+    @media(max-width:520px) {
+      .activation-page {
+        padding: 16px;
+      }
+
+      .activation-screen {
+        padding: 24px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg class="mark-logo" viewBox="0 0 160 32" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ElevatEd">
+        <rect x="0" y="0" width="32" height="32" rx="9" fill="#143358" />
+        <text x="16" y="24" font-size="18" text-anchor="middle">🦉</text>
+        <text x="40" y="22" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="17"
+          fill="#143358">Elevat<tspan fill="#E62129" font-style="italic">Ed</tspan></text>
+      </svg>
+      <span class="mark-badge">E</span>
+    </div>
+    <button class="nav active" data-view="overview"><span class="ic">🪶</span><span class="lbl">Overview</span></button>
+    <button class="nav" data-view="dream"><span class="ic">🌙</span><span class="lbl">Dream Goals</span></button>
+    <button class="nav" data-view="college"><span class="ic">🎓</span><span class="lbl">Misi Kuliah</span></button>
+    <button class="nav" data-view="action"><span class="ic">🎯</span><span class="lbl">Action Plan</span></button>
+    <button class="nav" data-view="tracker"><span class="ic">✅</span><span class="lbl">Tracker</span></button>
+    <button class="nav" data-view="report"><span class="ic">📄</span><span class="lbl">Report</span></button>
+    <button class="nav" data-view="identity"><span class="ic">🪪</span><span class="lbl">Identity</span></button>
+    <button class="nav" data-view="setup"><span class="ic">🛠️</span><span class="lbl">Setup</span></button>
+    <a class="nav nav-external" id="nav-newtab" href="#" rel="noopener"><span class="ic">↗</span><span class="lbl">Tab
+        Baru</span></a>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pg-title">Overview</h1>
+        <div class="sub" id="pg-sub"></div>
+      </div>
+      <div class="grow"></div>
+      <div id="pg-actions"></div>
+      <div id="score-widget"></div>
+    </div>
+    <div class="scroll">
+      <section class="view active" id="view-overview">
+        <div class="empty">Menghubungkan ke Google Sheets…</div>
+      </section>
+      <section class="view" id="view-dream"></section>
+      <section class="view" id="view-college"></section>
+      <section class="view" id="view-action"></section>
+      <section class="view" id="view-tracker"></section>
+      <section class="view" id="view-report"></section>
+      <section class="view" id="view-identity"></section>
+      <section class="view" id="view-setup"></section>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modal" id="modal"></div>
+  </div>
+  <div class="loading" id="loading">
+    <div class="spin"></div> Memuat…
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="fatal-banner" id="fatal-banner">
+    <button class="fx" id="fatal-close">✕</button>
+    <div class="ft">⚠️ Dashboard gagal memuat data</div>
+    <div class="fd" id="fatal-detail"></div>
+  </div>
+
+  <div class="activation-page">
+    <div class="activation-screen">
+      <h1>🔑 Aktivasi Akses</h1>
+      <div class="sub">Masukin token yang dikirim ke email kamu. Aktivasi bakal terikat ke akun Google yang lagi kamu
+        pakai login sekarang — pastiin ini akun yang sama waktu kamu beli.</div>
+      <label for="tok">Token Aktivasi</label>
+      <input id="tok" type="text" placeholder="IKG-XXXX-XXXX" autocomplete="off" autocapitalize="characters">
+      <button id="btn" onclick="submitToken()">Aktivasi Sekarang</button>
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyW9U68Y6HOBg18lAEQ6umJ8YerFw8c3aMzhF_v7yTVulRo_0lc4L-cn0ilxsEnRIwu/exec";
+
+    function getToken() {
+      return localStorage.getItem('user_token') || '';
+    }
+
+    async function callApi(action, payload = {}) {
+      const token = getToken();
+      const body = {
+        action: action,
+        token: token || (payload && payload.code ? payload.code : ''),
+        payload: payload
+      };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(body)
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    const INITIAL_VIEW = 'overview';
+    const S = {
+      personal: null, dream: null, college: null, action: null, gamification: null, trackerConfig: null,
+      tracker: null, webAppUrl: '', curSem: '', curCollegeSem: '', curCollegeCat: '', curAPQuarter: 'Q1', curTrackerQuarter: 'Q1',
+      setup: null
+    };
+    let curWeekIdx = 0;
+
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function showLoad(on) { document.getElementById('loading').classList.toggle('on', on); }
+    function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 2400); }
+    function pillClass(status) { const s = String(status).toLowerCase(); if (s.indexOf('tercapai') >= 0 || s.indexOf('selesai') >= 0) return 'tercapai'; if (s.indexOf('progress') >= 0 || s.indexOf('berjalan') >= 0) return 'progress'; if (s.indexOf('gagal') >= 0) return 'gagal'; return 'default'; }
+
+    // FIX (catatan #12): window.open() polos sering keblokir popup-blocker di HP
+    // (khususnya dari dalam iframe sandbox GAS). Klik anchor asli lebih tahan
+    // banting dibanding window.open() lewat script.
+    function openExternal_(url) {
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function showFatal(msg) {
+      const box = document.getElementById('fatal-banner');
+      document.getElementById('fatal-detail').textContent = msg;
+      box.classList.add('show');
+      showLoad(false);
+      try { console.error('[ElevatEd fatal]', msg); } catch (e) { }
+    }
+    document.getElementById('fatal-close').addEventListener('click', () => {
+      document.getElementById('fatal-banner').classList.remove('show');
+    });
+    window.addEventListener('error', e => {
+      showFatal((e && e.message) ? e.message : 'Terjadi error JavaScript yang nggak terduga.');
+    });
+
+    function onErr(e) {
+      const msg = (e && e.message) ? e.message : String(e || 'Respons server kosong.');
+      showLoad(false);
+      showFatal(msg);
+    }
+    function modalOpen(html, wide) {
+      const modal = document.getElementById('modal');
+      modal.innerHTML = html;
+      modal.classList.toggle('wide', !!wide);
+      document.getElementById('overlay').classList.add('open');
+    }
+    function modalClose() { document.getElementById('overlay').classList.remove('open'); }
+    document.getElementById('overlay').addEventListener('click', e => { if (e.target.id === 'overlay') modalClose(); });
+
+    // FIX (catatan #1/#9): tombol collapse ditaruh sebagai SIBLING dari .sidebar
+    // (bukan child-nya) biar gak ke-clip sama overflow-y:auto milik .sidebar.
+    function initSidebarCollapse() {
+      const sidebar = document.getElementById('sidebar');
+      let collapsed = false;
+      try { collapsed = localStorage.getItem('elevated_sidebar_collapsed') === '1'; } catch (e) { }
+      if (collapsed) sidebar.classList.add('collapsed');
+
+      const btn = document.createElement('button');
+      btn.className = 'sidebar-toggle';
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Collapse / lebarkan sidebar');
+      btn.innerHTML = '<span class="arrow">‹</span>';
+      btn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        try { localStorage.setItem('elevated_sidebar_collapsed', sidebar.classList.contains('collapsed') ? '1' : '0'); } catch (e) { }
+      });
+      sidebar.insertAdjacentElement('afterend', btn);
+    }
+
+    // Link "buka di tab baru" nempel di sidebar (nav item paling bawah).
+    // Klik pertama TIDAK langsung navigasi — backend dipanggil dulu buat
+    // ngecek URL Web App yang lagi jalan beneran bisa diakses (fetch ulang ke
+    // dirinya sendiri, cek status 200), biar nggak ada kejadian link mati/versi
+    // lama pas diklik. Baru klik ke-2 (setelah status "siap") yang benar-benar
+    // buka tab baru. Kalau URL-nya kosong dari awal (mis. dibuka lewat modal
+    // dialog di Sheets, bukan sebagai Web App), tombolnya disembunyikan total.
+    let newTabState_ = 'idle'; // idle | checking | ready
+    function initNewTabButton_(url) {
+      const a = document.getElementById('nav-newtab');
+      if (!a) return;
+      if (!url) { a.classList.remove('show'); return; }
+      a.classList.add('show');
+      a.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        if (newTabState_ === 'checking') return;
+        if (newTabState_ === 'ready' && a.dataset.verifiedUrl) {
+          openExternal_(a.dataset.verifiedUrl);
+          resetNewTabButton_(a);
+          return;
+        }
+        checkNewTabLink_(a);
+      });
+    }
+    function setNewTabLabel_(a, text) {
+      const lbl = a.querySelector('.lbl');
+      if (lbl) lbl.textContent = text;
+    }
+    async function checkNewTabLink_(a) {
+      newTabState_ = 'checking';
+      a.classList.remove('ready');
+      a.classList.add('checking');
+      setNewTabLabel_(a, 'Mengecek link…');
+      try {
+        const r = await callApi('verifyWebAppUrl');
+        if (r && r.ok) {
+          newTabState_ = 'ready';
+          a.dataset.verifiedUrl = r.url;
+          a.classList.remove('checking');
+          a.classList.add('ready');
+          setNewTabLabel_(a, 'Klik lagi buat buka ↗');
+          toast('✅ Link siap — klik sekali lagi buat buka tab baru');
+          clearTimeout(a._resetTimer);
+          a._resetTimer = setTimeout(function () { resetNewTabButton_(a); }, 15000);
+        } else {
+          resetNewTabButton_(a);
+          toast('❌ ' + (r && r.error ? r.error : 'Link web app belum bisa diakses.'));
+        }
+      } catch (err) {
+        resetNewTabButton_(a);
+        toast('❌ Gagal ngecek link: ' + (err && err.message ? err.message : err));
+      }
+    }
+    function resetNewTabButton_(a) {
+      newTabState_ = 'idle';
+      a.classList.remove('checking', 'ready');
+      delete a.dataset.verifiedUrl;
+      setNewTabLabel_(a, 'Tab Baru');
+      clearTimeout(a._resetTimer);
+    }
+
+    function formatAiSummary_(raw) {
+      const text = String(raw || '').trim();
+      if (!text) return '';
+      const blocks = text.split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
+      let html = '';
+      blocks.forEach(block => {
+        const startsWithBullet = /^[-•]\s/.test(block);
+        const parts = block.split(/\s+[-•]\s+/).map(p => p.trim()).filter(Boolean);
+        if (startsWithBullet) {
+          const items = parts.map(p => p.replace(/^[-•]\s*/, ''));
+          html += '<ul>' + items.map(it => `<li>${esc(it)}</li>`).join('') + '</ul>';
+        } else if (parts.length > 1) {
+          const intro = parts[0], items = parts.slice(1);
+          html += `<p>${esc(intro)}</p><ul>` + items.map(it => `<li>${esc(it)}</li>`).join('') + '</ul>';
+        } else {
+          html += `<p>${esc(block)}</p>`;
+        }
+      });
+      return html;
+    }
+
+    let bootStarted = false;
+    let bootTimer = null;
+    function validInitialView_() {
+      return INITIAL_VIEW || 'overview';
+    }
+    function bindNavigation_() {
+      document.querySelectorAll('.nav[data-view]').forEach(n => {
+        n.addEventListener('click', () => go(n.dataset.view));
+      });
+    }
+    async function startDashboard_() {
+      if (bootStarted) return;
+      bootStarted = true;
+      initSidebarCollapse();
+      bindNavigation_();
+      go(validInitialView_());
+      showLoad(true);
+
+      bootTimer = setTimeout(() => {
+        showFatal('Koneksi ke server terlalu lama. Refresh halaman lalu pastikan koneksi internet stabil.');
+      }, 30000);
+
+      try {
+        const b = await callApi('getInitialBundle');
+        clearTimeout(bootTimer);
+        if (!b || !b.success) {
+          showLoad(false);
+          onFatal(b && b.error ? b.error : 'Gagal memuat data awal');
+          return;
+        }
+        S.personal = b.personal; S.dream = b.dream; S.college = b.college;
+        S.gamification = b.gamification; S.trackerConfig = b.trackerConfig;
+        S.webAppUrl = b.webAppUrl || '';
+        S.action = null;
+        renderScoreWidget();
+        initNewTabButton_(S.webAppUrl);
+        showLoad(false);
+        go(validInitialView_());
+      } catch (err) {
+        clearTimeout(bootTimer);
+        showLoad(false);
+        onErr(err);
+      }
+    }
+    async function ensureActionLoaded_(cb) {
+      if (S.action) { cb(); return; }
+      showLoad(true);
+      try {
+        const r = await callApi('getActionPlanOnly');
+        showLoad(false);
+        if (r && r.action) { S.action = r.action; }
+        cb();
+      } catch (e) {
+        showLoad(false);
+        onErr(e);
+      }
+    }
+    function renderScoreWidget() {
+      const g = S.gamification; if (!g) return;
+      document.getElementById('score-widget').innerHTML = `<div class="streak-chip"><span class="bic">${g.badge.icon}</span><div><div class="bname">${esc(g.badge.name)}</div><div class="bpts">${g.total} poin${g.nextBadge ? ' · ' + (g.nextBadge.min - g.total) + ' lg ke ' + esc(g.nextBadge.name) : ''}</div></div></div>`;
+    }
+    async function refreshGamification() {
+      try {
+        const g = await callApi('getGamificationOnly');
+        if (g) { S.gamification = g; renderScoreWidget(); }
+      } catch (e) { }
+    }
+
+    // ── Donut chart Dream Goals (catatan #15) — SVG murni, ga perlu library ──
+    function buildDreamDonut_(summary) {
+      const total = summary.total || 0;
+      if (!total) {
+        return { svg: '<div class="empty" style="padding:20px 6px;">Belum ada goal</div>', legend: '' };
+      }
+      const segs = [
+        { label: 'Tercapai', val: summary.tercapai, color: 'var(--ok)' },
+        { label: 'On Progress', val: summary.onProgress, color: 'var(--navy-lt)' },
+        { label: 'Gagal', val: summary.gagal, color: 'var(--crimson)' },
+        { label: 'Lainnya', val: summary.lainnya, color: '#D8D2E8' },
+      ].filter(s => s.val > 0);
+      const r = 42, cx = 54, cy = 54, circ = 2 * Math.PI * r;
+      let offset = 0;
+      const arcs = segs.map(s => {
+        const len = (s.val / total) * circ;
+        const rot = (offset / circ) * 360 - 90;
+        offset += len;
+        return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" style="stroke:${s.color}" stroke-width="15" stroke-dasharray="${len} ${circ - len}" transform="rotate(${rot} ${cx} ${cy})"/>`;
+      }).join('');
+      const svg = `<svg viewBox="0 0 108 108" width="118" height="118">${arcs}<circle cx="${cx}" cy="${cy}" r="${r - 9}" style="fill:var(--surface)"/><text x="${cx}" y="${cy - 1}" text-anchor="middle" style="font-family:var(--font-display);font-weight:700;font-size:20px;fill:var(--navy)">${total}</text><text x="${cx}" y="${cy + 14}" text-anchor="middle" style="font-family:var(--font-mono);font-size:7px;fill:var(--faint)">GOALS</text></svg>`;
+      const legend = `<div class="dream-legend">${segs.map(s => `<div class="li"><span class="dot" style="background:${s.color}"></span>${esc(s.label)} (${s.val})</div>`).join('')}</div>`;
+      return { svg, legend };
+    }
+
+    function renderOverview() {
+      const p = S.personal;
+      if (!p) { document.getElementById('view-overview').innerHTML = '<div class="empty">Data personal belum ketemu. Cek sheet IKIGAI.</div>'; return; }
+      const d = S.dream || { summary: { total: 0, onProgress: 0, tercapai: 0, gagal: 0, lainnya: 0 } };
+      const donut = buildDreamDonut_(d.summary);
+      const collegeCount = S.college ? S.college.missions.length : 0;
+      document.getElementById('view-overview').innerHTML = `
+    <div class="owl-quote">
+      <div class="eyebrow">Sweetspot Ikigai Kamu</div>
+      <div class="role">${esc(p.sweetspot || 'Sweetspot belum dipilih')}</div>
+      <div class="line">Ikigai spot-ku: <b>${esc(p.ikigaiSpot || '-')}</b></div>
+      <div class="line" style="margin-top:8px;">"${esc(p.sliceOfLife || '-')}"</div>
+    </div>
+    ${(p.ikigaiSummary || p.swotSummary) ? `
+    <div class="card pad exec-summary">
+      <div class="sec-head" style="margin-top:0;"><h2>Executive Summary</h2></div>
+      ${p.ikigaiSummary ? `<div class="es-block"><div class="es-num">1</div><div class="es-body">${formatAiSummary_(p.ikigaiSummary)}</div></div>` : ''}
+      ${p.swotSummary ? `<div class="es-block"><div class="es-num">2</div><div class="es-body">${formatAiSummary_(p.swotSummary)}</div></div>` : ''}
+    </div>`: ''}
+    <div class="sec-head" style="margin-top:0;"><h2>Data Diri</h2></div>
+    <div class="card pad" style="margin-bottom:18px;">
+      <div class="profile-grid">
+        <div class="kv"><div class="k">Nama</div><div class="v">${esc(p.name || '—')}</div></div>
+        <div class="kv"><div class="k">Jurusan</div><div class="v">${esc(p.major || '—')}</div></div>
+        <div class="kv"><div class="k">Semester Saat Ini</div><div class="v">${esc(p.semester || '—')}</div></div>
+        <div class="kv"><div class="k">Karir Sesuai Jurusan?</div><div class="v">${esc(p.linear || '—')}</div></div>
+        <div class="kv"><div class="k">MBTI</div><div class="v">${esc(p.mbti || '—')}</div></div>
+        <div class="kv"><div class="k">Badge Saat Ini</div><div class="v">${S.gamification ? S.gamification.badge.icon + ' ' + esc(S.gamification.badge.name) : '—'}</div></div>
+      </div>
+    </div>
+    <div class="sec-head"><h2>Dream Goals</h2><span class="chip gold">College Missions: ${collegeCount}</span></div>
+    <div class="card pad" style="margin-bottom:20px;">
+      <div class="dream-donut-wrap">
+        <div>${donut.svg}${donut.legend}</div>
+        <div style="flex:1;min-width:220px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+          <div class="kpi" style="--accent:var(--navy)"><div class="lbl">Total Goals</div><div class="val">${d.summary.total}</div></div>
+          <div class="kpi" style="--accent:var(--navy-lt)"><div class="lbl">On Progress</div><div class="val" style="color:var(--navy-lt)">${d.summary.onProgress}</div></div>
+          <div class="kpi" style="--accent:var(--ok)"><div class="lbl">Tercapai</div><div class="val" style="color:var(--ok)">${d.summary.tercapai}</div></div>
+          <div class="kpi" style="--accent:var(--crimson)"><div class="lbl">Gagal</div><div class="val" style="color:var(--crimson)">${d.summary.gagal}</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-head"><h2>Character & Career Fit</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:20px;">
+      <div class="card pad">
+        <div style="margin-bottom:14px;"><div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;">Top 3 VIA Character</div><div style="margin-top:6px;">${p.via.map(v => `<span class="chip">${esc(v)}</span>`).join(' ') || '—'}</div></div>
+        <div><div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;">Top 3 Career Explorer</div><div style="margin-top:6px;">${p.careerExplorer.map(v => `<span class="chip gold">${esc(v)}</span>`).join(' ') || '—'}</div></div>
+      </div>
+      <div class="card pad">
+        <div style="margin-bottom:14px;"><div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;">Top 3 Hardskill</div><div style="margin-top:6px;">${p.hardskills.map(v => `<span class="chip">${esc(v)}</span>`).join(' ') || '—'}</div></div>
+        <div><div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;">Top 3 Softskill</div><div style="margin-top:6px;">${p.softskills.map(v => `<span class="chip crimson">${esc(v)}</span>`).join(' ') || '—'}</div></div>
+      </div>
+    </div>
+    <div class="sec-head"><h2>SWOT Analysis</h2></div>
+    <div class="swot-grid">
+      <div class="swot-box s"><div class="t-lbl" style="color:var(--ok)">🟩 Strength</div><ul>${p.swot.strength.map(v => `<li>${esc(v)}</li>`).join('') || '<li>—</li>'}</ul></div>
+      <div class="swot-box w"><div class="t-lbl" style="color:#8A5A0F">🟨 Weakness</div><ul>${p.swot.weakness.map(v => `<li>${esc(v)}</li>`).join('') || '<li>—</li>'}</ul></div>
+      <div class="swot-box o"><div class="t-lbl" style="color:var(--navy-lt)">🟦 Opportunity</div><ul>${p.swot.opportunity.map(v => `<li>${esc(v)}</li>`).join('') || '<li>—</li>'}</ul></div>
+      <div class="swot-box t"><div class="t-lbl" style="color:var(--crimson)">🟥 Threat</div><ul>${p.swot.threat.map(v => `<li>${esc(v)}</li>`).join('') || '<li>—</li>'}</ul></div>
+    </div>`;
+    }
+
+    function renderDream() {
+      const d = S.dream;
+      if (!d || !d.goals.length) { document.getElementById('view-dream').innerHTML = '<div class="empty">Belum ada dream goals. Isi di sheet DREAM PLAN.</div>'; return; }
+      if (!S.curSem || d.semesters.indexOf(S.curSem) < 0) S.curSem = d.semesters[0];
+      const list = d.bySemester[S.curSem] || [];
+      document.getElementById('view-dream').innerHTML = `
+    <div class="kpi-row">
+      <div class="kpi" style="--accent:var(--navy)"><div class="lbl">Total Goals</div><div class="val">${d.summary.total}</div></div>
+      <div class="kpi" style="--accent:var(--navy-lt)"><div class="lbl">On Progress</div><div class="val" style="color:var(--navy-lt)">${d.summary.onProgress}</div></div>
+      <div class="kpi" style="--accent:var(--ok)"><div class="lbl">Tercapai</div><div class="val" style="color:var(--ok)">${d.summary.tercapai}</div></div>
+      <div class="kpi" style="--accent:var(--crimson)"><div class="lbl">Gagal</div><div class="val" style="color:var(--crimson)">${d.summary.gagal}</div></div>
+    </div>
+    <div class="seg" id="sem-seg">${d.semesters.map(sm => `<button class="${sm === S.curSem ? 'active' : ''}" data-sem="${esc(sm)}">${esc(sm)}</button>`).join('')}</div>
+    <div class="sec-head"><h2>Goals — ${esc(S.curSem)}</h2></div>
+    <div id="dream-goals">${list.length ? list.map(g => `
+      <div class="goal-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;">
+          <div class="gname">${esc(g.goal)}</div>
+          <select class="pill ${pillClass(g.status)}" data-row="${g.row}" onchange="updateDreamStatus(this)">
+            ${d.statusOptions.map(o => `<option ${o === g.status ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="gmeta">${g.priority ? `<span class="chip">Prioritas: ${esc(g.priority)}</span>` : ''}${g.decision ? `<span class="chip crimson">${esc(g.decision)}</span>` : ''}</div>
+        ${g.smart ? `<div class="smart">${esc(g.smart)}</div>` : ''}
+      </div>`).join('') : '<div class="empty">Belum ada goal di semester ini.</div>'}</div>`;
+      document.querySelectorAll('#sem-seg button').forEach(b => b.addEventListener('click', () => { S.curSem = b.dataset.sem; renderDream(); }));
+    }
+    async function updateDreamStatus(sel) {
+      const row = Number(sel.dataset.row), status = sel.value;
+      sel.disabled = true;
+      showLoad(true);
+      try {
+        const r = await callApi('updateDreamStatus', { row: row, status: status });
+        showLoad(false); sel.disabled = false;
+        if (!r.success) { toast('Gagal: ' + r.error); return; }
+        sel.value = r.value; sel.className = 'pill ' + pillClass(r.value);
+        toast('✅ Status tersimpan ke sheet'); refreshGamification();
+      } catch (e) {
+        sel.disabled = false; showLoad(false); onErr(e);
+      }
+    }
+
+    function renderCollege() {
+      const c = S.college, p = S.personal;
+      if (!c || !c.missions.length) { document.getElementById('view-college').innerHTML = '<div class="empty">Belum ada misi. Isi di sheet COLLEGE PLAN.</div>'; return; }
+      const curLabel = c.semesters.find(sm => p && sm.replace(/\D/g, '') === String(p.semesterNum)) || c.semesters[0];
+      if (!S.curCollegeSem) S.curCollegeSem = curLabel;
+      const list = c.bySemester[S.curCollegeSem] || [];
+      const cats = [...new Set(list.map(m => m.kategori))];
+      if (!S.curCollegeCat || cats.indexOf(S.curCollegeCat) < 0) S.curCollegeCat = cats[0] || '';
+      const filtered = list.filter(m => m.kategori === S.curCollegeCat);
+
+      document.getElementById('view-college').innerHTML = `
+    <div class="seg" id="cs-seg" style="margin-bottom:10px;">${c.semesters.map(sm => {
+        const active = sm === S.curCollegeSem, isCurrent = sm === curLabel;
+        return `<button class="${active ? 'active' : ''} ${isCurrent ? '' : 'disabled'}" ${isCurrent ? `data-sem="${esc(sm)}"` : ''} title="${isCurrent ? '' : 'Belum semester ini'}">${esc(sm)}${isCurrent ? '' : ' 🔒'}</button>`;
+      }).join('')}</div>
+    <div class="seg" id="cat-seg">${cats.map(ct => `<button class="${ct === S.curCollegeCat ? 'active' : ''}" data-cat="${esc(ct)}">${esc(ct)}</button>`).join('')}</div>
+    <div class="sec-head"><h2>${esc(S.curCollegeCat)} — ${esc(S.curCollegeSem)}</h2></div>
+    <div class="card tbl-wrap"><table class="tbl"><thead><tr><th>Misi</th><th>Prioritas</th><th>Status</th></tr></thead><tbody>
+      ${filtered.length ? filtered.map(m => `<tr><td data-label="Misi">${esc(m.misi)}</td><td data-label="Prioritas">${m.prioritas ? `<span class="chip gold">${esc(m.prioritas)}</span>` : '—'}</td>
+        <td data-label="Status"><select class="pill ${pillClass(m.progress)}" data-row="${m.row}" onchange="updateCollegeProgress(this)">
+          ${c.statusOptions.map(o => `<option ${o === m.progress ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+        </select></td></tr>`).join('') : '<tr><td colspan="3" class="empty">Kosong.</td></tr>'}
+    </tbody></table></div>`;
+      document.querySelectorAll('#cs-seg button[data-sem]').forEach(b => b.addEventListener('click', () => { S.curCollegeSem = b.dataset.sem; S.curCollegeCat = ''; renderCollege(); }));
+      document.querySelectorAll('#cat-seg button').forEach(b => b.addEventListener('click', () => { S.curCollegeCat = b.dataset.cat; renderCollege(); }));
+    }
+    async function updateCollegeProgress(sel) {
+      const row = Number(sel.dataset.row), status = sel.value;
+      sel.disabled = true;
+      showLoad(true);
+      try {
+        const r = await callApi('updateCollegeProgress', { row: row, status: status });
+        showLoad(false); sel.disabled = false;
+        if (!r.success) { toast('Gagal: ' + r.error); return; }
+        sel.value = r.value; sel.className = 'pill ' + pillClass(r.value);
+        toast('✅ Progress tersimpan ke sheet'); refreshGamification();
+      } catch (e) {
+        sel.disabled = false; showLoad(false); onErr(e);
+      }
+    }
+    async function updateActionStatus(sel) {
+      const row = Number(sel.dataset.row), col = Number(sel.dataset.col), status = sel.value;
+      sel.disabled = true;
+      showLoad(true);
+      try {
+        const r = await callApi('updateActionStatus', { row: row, col: col, status: status });
+        showLoad(false); sel.disabled = false;
+        if (!r.success) { toast('Gagal: ' + r.error); return; }
+        sel.value = r.value; sel.className = 'pill ' + pillClass(r.value);
+        toast('✅ Status tersimpan ke sheet');
+      } catch (e) {
+        sel.disabled = false; showLoad(false); onErr(e);
+      }
+    }
+
+    function renderAction() {
+      if (!S.action) {
+        document.getElementById('view-action').innerHTML = '<div class="empty">Memuat Action Plan…</div>';
+        ensureActionLoaded_(renderAction);
+        return;
+      }
+      const a = S.action;
+      if (!a || !a.blocks.length) { document.getElementById('view-action').innerHTML = '<div class="empty">Belum ada taktik ter-generate. Isi di sheet ACTION PLAN.</div>'; return; }
+      const filtered = a.blocks.filter(b => b.quarter === S.curAPQuarter);
+      document.getElementById('view-action').innerHTML = `
+    <div class="sec-head" style="margin-top:0;">
+      <div class="seg" id="ap-seg">
+        <button class="${S.curAPQuarter === 'Q1' ? 'active' : ''}" data-q="Q1">Quarter 1</button>
+        <button class="${S.curAPQuarter === 'Q2' ? 'active' : ''}" data-q="Q2">Quarter 2</button>
+      </div>
+      <div class="grow"></div>
+      <button class="btn gold" id="bulk-cal-btn">📅 Input Semua ke Kalender</button>
+    </div>
+    <div id="ap-body">${filtered.length ? filtered.map(b => `
+      <div class="tactic-goal">
+        <div class="gname">${esc(b.goal)}</div>
+        <div class="card tbl-wrap"><table class="tbl"><thead><tr><th>No</th><th>Taktik</th><th>Frekuensi</th><th>Status</th><th>Kalender</th></tr></thead><tbody>
+          ${b.tactics.map(t => `<tr><td class="mono" data-label="No">${esc(t.no)}</td><td data-label="Taktik">${esc(t.taktik)}</td><td class="mono" data-label="Frekuensi">${esc(t.frekuensi) || '—'}</td>
+            <td data-label="Status"><select class="pill ${pillClass(t.status)}" data-row="${t.row}" data-col="${t.statusCol}" onchange="updateActionStatus(this)">
+              ${a.statusOptions.map(o => `<option ${o === t.status ? 'selected' : ''}>${esc(o)}</option>`).join('')}
+            </select></td>
+            <td data-label="Kalender"><button class="btn sm cal-btn" data-taktik="${esc(t.taktik)}" data-target="${t.target}" data-goal="${esc(b.goal)}" data-frekuensi="${esc(t.frekuensi)}">📅</button></td></tr>`).join('')}
+        </tbody></table></div>
+      </div>`).join('') : '<div class="empty">Belum ada goal di quarter ini.</div>'}</div>`;
+      document.querySelectorAll('#ap-seg button').forEach(b => b.addEventListener('click', () => {
+        S.curAPQuarter = b.dataset.q;
+        document.querySelectorAll('#ap-seg button').forEach(x => x.classList.toggle('active', x === b));
+        renderAction();
+      }));
+      document.querySelectorAll('.cal-btn').forEach(b => b.addEventListener('click', () => openCalendarModal(b.dataset.taktik, Number(b.dataset.target), b.dataset.goal, b.dataset.frekuensi)));
+      document.getElementById('bulk-cal-btn').addEventListener('click', openBulkCalendarModal);
+    }
+
+    const GCAL_DAY_CODE = { Senin: 'MO', Selasa: 'TU', Rabu: 'WE', Kamis: 'TH', Jumat: 'FR', Sabtu: 'SA', Minggu: 'SU' };
+    const GCAL_DAY_JS = { Minggu: 0, Senin: 1, Selasa: 2, Rabu: 3, Kamis: 4, Jumat: 5, Sabtu: 6 };
+    function fmtGCalDate_(d) { return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; }
+    function trackerStartDate_() { return S.trackerConfig ? new Date(S.trackerConfig.startDate) : new Date(); }
+    function defaultUntilStr_() { const d = trackerStartDate_(); d.setDate(d.getDate() + 84); return d.toISOString().slice(0, 10); }
+    function buildDefaultDesc_(goal, frekuensi, target) {
+      return 'Goal: ' + (goal || '-') + '\nFrekuensi asli (Action Plan): ' + (frekuensi || '-') + '\nTarget: ' + target + 'x per minggu\nSumber: Student Ikigai Dashboard — Action Plan/Tracker';
+    }
+    // FIX (catatan #4): dukung tipe pengulangan Google Calendar yg standar
+    // (Setiap Hari/Minggu/Bulan/Tahun) + Custom (pilih hari + deadline manual).
+    // freqType: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CUSTOM'
+    function buildGCalUrl_(title, desc, freqType, weekdays, startTimeStr, endTimeStr, untilDateStr) {
+      const start = trackerStartDate_();
+      const sp = (startTimeStr || '19:00').split(':').map(Number);
+      const ep = (endTimeStr || '20:00').split(':').map(Number);
+      const needsByday = (freqType === 'WEEKLY' || freqType === 'CUSTOM');
+      let firstDate = new Date(start);
+      if (needsByday) {
+        const targetDows = (weekdays || []).map(w => GCAL_DAY_JS[w]);
+        let guard = 0;
+        while (targetDows.indexOf(firstDate.getDay()) < 0 && guard < 8) { firstDate.setDate(firstDate.getDate() + 1); guard++; }
+      }
+      firstDate.setHours(sp[0] || 19, sp[1] || 0, 0, 0);
+      const endDate = new Date(firstDate);
+      endDate.setHours(ep[0] || 20, ep[1] || 0, 0, 0);
+      if (endDate <= firstDate) endDate.setDate(endDate.getDate() + 1);
+      const until = new Date((untilDateStr || defaultUntilStr_()) + 'T23:59:00');
+      let rrule;
+      if (needsByday) {
+        const byday = (weekdays || []).map(w => GCAL_DAY_CODE[w]).filter(Boolean).join(',');
+        rrule = 'FREQ=WEEKLY;BYDAY=' + byday + ';UNTIL=' + fmtGCalDate_(until);
+      } else {
+        rrule = 'FREQ=' + freqType + ';UNTIL=' + fmtGCalDate_(until);
+      }
+      const params = new URLSearchParams({
+        action: 'TEMPLATE', text: title,
+        dates: fmtGCalDate_(firstDate) + '/' + fmtGCalDate_(endDate),
+        details: desc,
+        recur: 'RRULE:' + rrule,
+      });
+      return 'https://calendar.google.com/calendar/render?' + params.toString();
+    }
+    function calRepeatTypeHtml_(idPrefix) {
+      return `<label style="font-size:11px;font-weight:700;color:var(--muted);">Pengulangan</label>
+    <select id="${idPrefix}-repeat-type" class="input" style="margin:4px 0 12px;">
+      <option value="WEEKLY">Setiap Minggu (pilih hari di bawah)</option>
+      <option value="DAILY">Setiap Hari</option>
+      <option value="MONTHLY">Setiap Bulan</option>
+      <option value="YEARLY">Setiap Tahun</option>
+      <option value="CUSTOM">Custom (pilih hari sendiri)</option>
+    </select>`;
+    }
+    function openCalendarModal(taktikText, target, goalName, frekuensiText) {
+      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+      const defaultDesc = buildDefaultDesc_(goalName, frekuensiText, target);
+      modalOpen(`
+    <h3 style="font-family:var(--font-display);color:var(--navy);margin-bottom:6px;">📅 Jadwalin ke Kalender</h3>
+    <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px;">Semua field di bawah bisa kamu ubah dulu sebelum kebuka ke Google Calendar. Kalau target ${target}x/minggu, centang ${target} hari di bawah — otomatis jadi 1 event recurring yang muncul ${target}x seminggu.</div>
+
+    <label style="font-size:11px;font-weight:700;color:var(--muted);">Judul Event</label>
+    <input type="text" id="cal-title" class="input" value="${esc(taktikText)}" style="margin:4px 0 12px;">
+
+    <label style="font-size:11px;font-weight:700;color:var(--muted);">Deskripsi / Rincian (dari Action Plan)</label>
+    <textarea id="cal-desc" class="input" rows="4" style="margin:4px 0 12px;resize:vertical;">${esc(defaultDesc)}</textarea>
+
+    ${calRepeatTypeHtml_('cal')}
+
+    <div id="cal-days-wrap">
+      <label style="font-size:11px;font-weight:700;color:var(--muted);">Hari Pengulangan (target: ${target}x/minggu)</label>
+      <div class="day-pick" id="cal-days" style="margin:6px 0 12px;">${days.map(d => `<label class="day-pill"><input type="checkbox" value="${d}">${d.slice(0, 3)}</label>`).join('')}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+      <div><label style="font-size:11px;font-weight:700;color:var(--muted);">Jam Mulai</label><input type="time" id="cal-start-time" class="input" value="19:00" style="margin-top:4px;"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--muted);">Jam Selesai</label><input type="time" id="cal-end-time" class="input" value="20:00" style="margin-top:4px;"></div>
+    </div>
+
+    <label style="font-size:11px;font-weight:700;color:var(--muted);">Berulang Sampai Tanggal (deadline)</label>
+    <input type="date" id="cal-until" class="input" value="${defaultUntilStr_()}" style="margin:4px 0 4px;">
+    <div style="font-size:10.5px;color:var(--faint);margin-bottom:10px;">Default = 12 minggu dari start quarter kamu di Tracker, tapi bebas dimajuin/dimundurin.</div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+      <button class="btn" onclick="modalClose()">Batal</button>
+      <button class="btn primary" id="cal-confirm-btn">Buka di Google Calendar ↗</button>
+    </div>`, true);
+      const repeatSel = document.getElementById('cal-repeat-type');
+      const daysWrap = document.getElementById('cal-days-wrap');
+      repeatSel.addEventListener('change', () => {
+        daysWrap.style.display = (repeatSel.value === 'WEEKLY' || repeatSel.value === 'CUSTOM') ? '' : 'none';
+      });
+      document.getElementById('cal-confirm-btn').addEventListener('click', submitCalendar);
+    }
+    function submitCalendar() {
+      const freqType = document.getElementById('cal-repeat-type').value;
+      const needsDays = (freqType === 'WEEKLY' || freqType === 'CUSTOM');
+      const days = Array.from(document.querySelectorAll('#cal-days input:checked')).map(b => b.value);
+      if (needsDays && !days.length) { toast('Pilih minimal 1 hari'); return; }
+      const title = document.getElementById('cal-title').value.trim();
+      if (!title) { toast('Judul event ga boleh kosong'); return; }
+      const desc = document.getElementById('cal-desc').value;
+      const startTime = document.getElementById('cal-start-time').value;
+      const endTime = document.getElementById('cal-end-time').value;
+      const until = document.getElementById('cal-until').value;
+      const url = buildGCalUrl_(title, desc, freqType, days, startTime, endTime, until);
+      openExternal_(url);
+      modalClose();
+    }
+    function openBulkCalendarModal() {
+      const filtered = S.action.blocks.filter(b => b.quarter === S.curAPQuarter);
+      const allTactics = [];
+      filtered.forEach(b => b.tactics.forEach(t => allTactics.push({ taktik: t.taktik, target: t.target, goal: b.goal, frekuensi: t.frekuensi })));
+      if (!allTactics.length) { toast('Belum ada taktik di quarter ini'); return; }
+      window._bulkTactics = allTactics;
+      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+      modalOpen(`
+    <h3 style="font-family:var(--font-display);color:var(--navy);margin-bottom:6px;">📅 Input Semua ke Kalender</h3>
+    <div style="font-size:11.5px;color:var(--muted);margin-bottom:12px;">Tiap taktik jadi event terpisah — pilih pengulangan & hari per taktik, atur jam & deadline yang berlaku buat semua, terus klik "Buka" satu-satu (Google cuma bisa bikin 1 event per link).</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+      <div><label style="font-size:11px;font-weight:700;color:var(--muted);">Jam Mulai</label><input type="time" id="bulk-start-time" class="input" value="19:00" style="margin-top:4px;"></div>
+      <div><label style="font-size:11px;font-weight:700;color:var(--muted);">Jam Selesai</label><input type="time" id="bulk-end-time" class="input" value="20:00" style="margin-top:4px;"></div>
+    </div>
+    <label style="font-size:11px;font-weight:700;color:var(--muted);">Berulang Sampai Tanggal (deadline, berlaku semua)</label>
+    <input type="date" id="bulk-until" class="input" value="${defaultUntilStr_()}" style="margin:4px 0 14px;">
+    <div id="bulk-list" style="max-height:340px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;">
+      ${allTactics.map((t, i) => `
+        <div style="border:2px solid var(--border);border-radius:12px;padding:10px 12px;">
+          <input type="text" class="input bulk-title" data-idx="${i}" value="${esc(t.taktik)}" style="font-size:12px;font-weight:650;margin-bottom:6px;">
+          <div style="font-size:10.5px;color:var(--faint);margin-bottom:6px;">Target: ${t.target}x/minggu · ${esc(t.frekuensi || '-')}</div>
+          <select class="input bulk-repeat" data-idx="${i}" style="margin-bottom:6px;font-size:11.5px;">
+            <option value="WEEKLY">Setiap Minggu</option>
+            <option value="DAILY">Setiap Hari</option>
+            <option value="MONTHLY">Setiap Bulan</option>
+            <option value="YEARLY">Setiap Tahun</option>
+            <option value="CUSTOM">Custom</option>
+          </select>
+          <div class="day-pick bulk-days" data-idx="${i}">${days.map(d => `<label class="day-pill sm"><input type="checkbox" value="${d}">${d.slice(0, 2)}</label>`).join('')}</div>
+          <button class="btn sm primary bulk-open-btn" data-idx="${i}" style="margin-top:8px;">Buka ↗</button>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+      <button class="btn" onclick="modalClose()">Selesai</button>
+    </div>`, true);
+      document.querySelectorAll('.bulk-repeat').forEach(sel => sel.addEventListener('change', () => {
+        const idx = sel.dataset.idx;
+        const row = document.querySelector('.bulk-days[data-idx="' + idx + '"]');
+        row.style.display = (sel.value === 'WEEKLY' || sel.value === 'CUSTOM') ? '' : 'none';
+      }));
+      document.querySelectorAll('.bulk-open-btn').forEach(b => b.addEventListener('click', () => {
+        const idx = Number(b.dataset.idx);
+        const freqType = document.querySelector('.bulk-repeat[data-idx="' + idx + '"]').value;
+        const needsDays = (freqType === 'WEEKLY' || freqType === 'CUSTOM');
+        const row = document.querySelector('#bulk-list [data-idx="' + idx + '"].day-pick');
+        const days2 = Array.from(row.querySelectorAll('input:checked')).map(c => c.value);
+        if (needsDays && !days2.length) { toast('Pilih hari dulu buat taktik ini'); return; }
+        const title = document.querySelector('.bulk-title[data-idx="' + idx + '"]').value.trim() || window._bulkTactics[idx].taktik;
+        const desc = buildDefaultDesc_(window._bulkTactics[idx].goal, window._bulkTactics[idx].frekuensi, window._bulkTactics[idx].target);
+        const startTime = document.getElementById('bulk-start-time').value;
+        const endTime = document.getElementById('bulk-end-time').value;
+        const until = document.getElementById('bulk-until').value;
+        openExternal_(buildGCalUrl_(title, desc, freqType, days2, startTime, endTime, until));
+      }));
+    }
+
+    function renderTracker() {
+      document.getElementById('view-tracker').innerHTML = `
+    <div class="sec-head" style="margin-top:0;">
+      <div class="seg" id="tq-seg">
+        <button class="${S.curTrackerQuarter === 'Q1' ? 'active' : ''}" data-q="Q1">Quarter 1</button>
+        <button class="${S.curTrackerQuarter === 'Q2' ? 'active' : ''}" data-q="Q2">Quarter 2</button>
+      </div>
+      <div class="grow"></div>
+      <div class="start-date-box">
+        <span style="font-size:11px;color:var(--muted);font-weight:700;">Mulai Quarter:</span>
+        <input type="date" id="start-date-input" value="${S.trackerConfig ? S.trackerConfig.startDate.slice(0, 10) : ''}">
+        <button class="btn primary" id="refresh-cal-btn">🔄 Refresh Kalender</button>
+      </div>
+    </div>
+    <div class="week-hero" id="tk-current-week"></div>
+    <div id="tk-week-seg"></div>
+    <div id="tk-body"><div class="empty">Memuat tracker…</div></div>`;
+      // FIX (catatan #6): toggle class active langsung di klik, bukan cuma
+      // ngandelin render awal — sebelumnya klik Quarter 2 gak update warnanya
+      // krn markup #tq-seg cuma digenerate sekali di awal renderTracker().
+      document.querySelectorAll('#tq-seg button').forEach(b => b.addEventListener('click', () => {
+        S.curTrackerQuarter = b.dataset.q;
+        document.querySelectorAll('#tq-seg button').forEach(x => x.classList.toggle('active', x === b));
+        loadTracker();
+      }));
+      document.getElementById('refresh-cal-btn').addEventListener('click', async () => {
+        const val = document.getElementById('start-date-input').value;
+        if (!val) { toast('Pilih tanggal dulu'); return; }
+        showLoad(true);
+        try {
+          const r = await callApi('setTrackerStartDate', { dateStr: val });
+          showLoad(false);
+          if (!r.success) { toast('Gagal: ' + r.error); return; }
+          S.trackerConfig.startDate = r.startDate; toast('📅 Kalender di-refresh'); loadTracker();
+        } catch (e) {
+          showLoad(false); onErr(e);
+        }
+      });
+      loadTracker();
+    }
+    function loadTracker() {
+      ensureActionLoaded_(async () => {
+        showLoad(true);
+        try {
+          const tv = await callApi('getTrackerView', { quarter: S.curTrackerQuarter, cachedBlocks: S.action.blocks });
+          showLoad(false); S.tracker = tv; curWeekIdx = 0;
+          renderWeekPills_();
+          drawTrackerWeek();
+        } catch (e) {
+          showLoad(false); onErr(e);
+        }
+      });
+    }
+    // FIX (catatan #7): grid nyebar rata selebar box (.week-pill-grid), bukan
+    // pill numpuk kiri kayak .seg biasa.
+    function renderWeekPills_() {
+      const tv = S.tracker;
+      document.getElementById('tk-week-seg').innerHTML = `<div class="week-pill-grid" style="margin-bottom:6px;">${tv.weeks.map((w, i) => `<button class="${i === curWeekIdx ? 'active' : ''}" data-w="${i}">${w.w}</button>`).join('')}</div>`;
+      document.querySelectorAll('#tk-week-seg button').forEach(b => b.addEventListener('click', () => {
+        curWeekIdx = Number(b.dataset.w);
+        document.querySelectorAll('#tk-week-seg button').forEach(x => x.classList.toggle('active', x === b));
+        drawTrackerWeek();
+      }));
+    }
+    function drawTrackerWeek() {
+      const tv = S.tracker; const week = tv.weeks[curWeekIdx];
+      document.getElementById('tk-current-week').innerHTML = `<div class="wk-num">${esc(week.w)}</div><div><div class="wk-label">${esc(week.label)}</div><div class="wk-range">${esc(week.rangeLabel)}</div></div>`;
+      const body = document.getElementById('tk-body');
+      if (!tv.goals.length) { body.innerHTML = '<div class="empty">Belum ada taktik di quarter ini. Isi dulu di Action Plan.</div>'; return; }
+      // FIX (catatan #3): taktik biweekly/bulanan SEKARANG TETAP MUNCUL di semua
+      // minggu (nggak lagi cuma nongol di minggu 1/3/5 dst). Backend udah numpuk
+      // 1 periode ke 1 record yang sama, jadi status checked/lock-nya otomatis
+      // sinkron di semua minggu dalam periode itu — begitu target periode
+      // tercapai di minggu manapun, minggu lain dalam periode itu ikut kelock.
+      body.innerHTML = tv.goals.map(g => {
+        if (!g.tactics.length) return '';
+        return `
+      <div class="tk-goal-wrap">
+        <div class="tk-goal-heading"><span class="gh-ic">🎯</span><span class="gh-text">${esc(g.goal)}</span></div>
+        ${g.tactics.map(t => {
+          const wk = t.weeks[curWeekIdx];
+          const locked = wk.checkedCount >= t.target;
+          const periodEnd = (wk.periodStartWeek || curWeekIdx + 1) + (t.periodWeeks || 1) - 1;
+          const periodChip = t.periodWeeks > 1 ? `<span class="chip">🔁 periode Minggu ${wk.periodStartWeek}–${periodEnd}</span>` : '';
+          return `<div class="tk-task">
+            <div class="tk-task-top"><div class="tname">${esc(t.taktik)}</div>${periodChip}<span class="chip ${locked ? 'gold' : ''}">${wk.checkedCount}/${t.target}x</span></div>
+            <div class="tk-days">${wk.days.map((checked, di) => `
+              <div class="day-box ${checked ? 'checked' : ''} ${(!checked && locked) ? 'lockedday' : ''}"
+                data-goal="${g.idx}" data-tactic="${esc(t.no)}" data-week="${wk.week}" data-day="${di}" data-target="${t.target}" data-period="${t.periodWeeks || 1}">
+                <span class="dlbl">${week.days[di].name.slice(0, 3)}</span>${checked ? '✓' : ''}
+              </div>`).join('')}</div>
+            <div class="bar"><i style="width:${Math.min(100, Math.round(wk.checkedCount / t.target * 100))}%"></i></div>
+            <div class="tk-actions">
+              <button class="btn sm check-all-btn" data-goal="${g.idx}" data-tactic="${esc(t.no)}" data-week="${wk.week}" data-target="${t.target}" data-period="${t.periodWeeks || 1}">✅ Ceklis Semua</button>
+              <button class="btn sm ghost reset-week-btn" data-goal="${g.idx}" data-tactic="${esc(t.no)}" data-week="${wk.week}" data-period="${t.periodWeeks || 1}">↺ Reset</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+      }).join('');
+      if (!body.innerHTML.trim()) {
+        body.innerHTML = '<div class="empty">Belum ada taktik buat quarter ini.</div>';
+      }
+      document.querySelectorAll('.day-box').forEach(el => {
+        el.addEventListener('click', async () => {
+          if (el.classList.contains('lockedday')) { toast('🔒 Target periode ini udah tercapai'); return; }
+          const goalIdx = Number(el.dataset.goal), tacticNo = el.dataset.tactic, week = Number(el.dataset.week), day = Number(el.dataset.day), target = Number(el.dataset.target), period = Number(el.dataset.period) || 1;
+          const willCheck = !el.classList.contains('checked');
+          try {
+            const r = await callApi('toggleTrackerCheck2', { quarter: S.curTrackerQuarter, goalIdx: goalIdx, tacticNo: tacticNo, week: week, dayIndex: day, value: willCheck, target: target, periodWeeks: period });
+            if (!r.success) { toast(r.locked ? '🔒 ' + r.error : 'Gagal: ' + r.error); return; }
+            toast(willCheck ? '✅ Checked' : '↩️ Unchecked');
+            loadTracker(); refreshGamification();
+          } catch (e) {
+            onErr(e);
+          }
+        });
+      });
+      document.querySelectorAll('.check-all-btn').forEach(b => b.addEventListener('click', async () => {
+        const goalIdx = Number(b.dataset.goal), tacticNo = b.dataset.tactic, week = Number(b.dataset.week), target = Number(b.dataset.target), period = Number(b.dataset.period) || 1;
+        showLoad(true);
+        try {
+          await callApi('checkAllTrackerWeek', { quarter: S.curTrackerQuarter, goalIdx: goalIdx, tacticNo: tacticNo, week: week, target: target, periodWeeks: period });
+          showLoad(false); toast('✅ Diceklis semua (' + target + 'x)'); loadTracker(); refreshGamification();
+        } catch (e) {
+          showLoad(false); onErr(e);
+        }
+      }));
+      document.querySelectorAll('.reset-week-btn').forEach(b => b.addEventListener('click', async () => {
+        const goalIdx = Number(b.dataset.goal), tacticNo = b.dataset.tactic, week = Number(b.dataset.week), period = Number(b.dataset.period) || 1;
+        showLoad(true);
+        try {
+          await callApi('checkAllTrackerWeek', { quarter: S.curTrackerQuarter, goalIdx: goalIdx, tacticNo: tacticNo, week: week, target: 0, periodWeeks: period });
+          showLoad(false); toast('↺ Direset'); loadTracker(); refreshGamification();
+        } catch (e) {
+          showLoad(false); onErr(e);
+        }
+      }));
+    }
+
+    async function renderReport() {
+      document.getElementById('view-report').innerHTML = '<div class="empty">Menyusun report…</div>';
+      try {
+        const rp = await callApi('getReportBundle');
+        const p = rp.personal, g = rp.gamification;
+        const dreamRows = rp.dreamEval.map(d => `<tr class="${d.overdue ? 'overdue' : ''}"><td data-label="Goal">${esc(d.goal)}</td><td class="mono" data-label="Target Semester">${esc(d.targetSem)}</td><td data-label="Status"><span class="pill ${pillClass(d.status)}">${esc(d.status)}</span></td></tr>`).join('') || '<tr><td colspan="3" class="empty">Belum ada goal yang perlu dievaluasi.</td></tr>';
+        const collegeRows = rp.collegeEval.map(m => `<tr class="${m.overdue ? 'overdue' : ''}"><td data-label="Misi">${esc(m.misi)}</td><td data-label="Kategori">${esc(m.kategori)}</td><td class="mono" data-label="Semester">${esc(m.semester)}</td><td data-label="Status"><span class="pill ${pillClass(m.progress)}">${esc(m.progress)}</span></td></tr>`).join('') || '<tr><td colspan="4" class="empty">Belum ada misi yang perlu dievaluasi.</td></tr>';
+        const badgeGrid = g.specialBadges.length ? `<div class="badge-grid">${g.specialBadges.map(b => `<div class="badge-cell"><div class="bic">${b.icon}</div><div class="bn">${esc(b.name)}</div><div class="bd">${esc(b.desc)}</div></div>`).join('')}</div>` : '<div class="empty">Belum ada badge spesial — terus lanjutin progressnya!</div>';
+
+        document.getElementById('view-report').innerHTML = `
+      <div class="no-print" style="margin-bottom:16px;"><button class="btn gold" onclick="downloadReportPDF()">Download Report (PDF)</button></div>
+      <div class="doc-wrap">
+        <div class="report-cover">
+          <div class="tag">🦉 Laporan Perkembangan</div>
+          <h1>${esc(p.name)}</h1>
+          <div class="meta"><b>${esc(p.major)}</b> · ${esc(p.semester)} · MBTI ${esc(p.mbti || '—')}</div>
+        </div>
+        <div class="report-kpi-row">
+          <div class="report-kpi"><div class="n">${g.total}</div><div class="l">Skor Total</div></div>
+          <div class="report-kpi"><div class="n">${g.badge.icon}</div><div class="l">${esc(g.badge.name)}</div></div>
+          <div class="report-kpi"><div class="n">${rp.dreamDoneCount}/${rp.dreamEval.length}</div><div class="l">Dream Tercapai</div></div>
+          <div class="report-kpi"><div class="n">${rp.collegeDoneCount}/${rp.collegeEval.length}</div><div class="l">Misi Tercapai</div></div>
+        </div>
+        <div class="report-section"><div class="sh">🌙<h3>Dream Plan — semester ≤ sekarang</h3><span class="count">${rp.dreamEval.length} goal</span></div>
+          <div class="card tbl-wrap"><table class="rtbl"><thead><tr><th>Goal</th><th>Target Semester</th><th>Status</th></tr></thead><tbody>${dreamRows}</tbody></table></div></div>
+        <div class="report-section"><div class="sh">🎓<h3>College Plan — semester ≤ sekarang</h3><span class="count">${rp.collegeEval.length} misi</span></div>
+          <div class="card tbl-wrap"><table class="rtbl"><thead><tr><th>Misi</th><th>Kategori</th><th>Semester</th><th>Status</th></tr></thead><tbody>${collegeRows}</tbody></table></div></div>
+        <div class="report-section"><div class="sh">🎮<h3>Badge & Skor</h3></div>${badgeGrid}
+          <div class="card" style="margin-top:10px;"><table class="rtbl"><tbody>
+            <tr><td data-label="Sumber">Dream Plan</td><td class="mono" data-label="Poin">${g.breakdown.dream} poin</td></tr>
+            <tr><td data-label="Sumber">College Plan</td><td class="mono" data-label="Poin">${g.breakdown.college} poin</td></tr>
+            <tr><td data-label="Sumber">Tracker</td><td class="mono" data-label="Poin">${g.breakdown.tracker} poin</td></tr>
+          </tbody></table></div>
+        </div>
+        <div class="report-footer">Baris merah = target semester udah lewat tapi belum Tercapai</div>
+      </div>`;
+      } catch (e) {
+        onErr(e);
+      }
+    }
+    // FIX (catatan #10): link script/URL/tanggal yg nongol pas print itu
+    // header-footer bawaan Chrome (bukan dari halaman ini) — uncheck "Headers
+    // and footers" di dialog print/Save as PDF (bagian "More settings").
+    // Yang bisa kita kontrol: judul dokumen dibikin bersih dulu sebelum print.
+    function downloadReportPDF() {
+      const prevTitle = document.title;
+      document.title = 'Report';
+      document.body.classList.add('printing-report');
+      toast('🖨️ Menyiapkan Save as PDF… (uncheck "Headers and footers" di More settings)');
+      setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('printing-report'); document.title = prevTitle; }, 400); }, 300);
+    }
+
+    async function renderIdentity() {
+      document.getElementById('view-identity').innerHTML = '<div class="empty">Menyusun identity report…</div>';
+      try {
+        const rp = await callApi('getIdentityBundle');
+        const p = rp.personal, info = rp.mbtiInfo;
+        document.getElementById('view-identity').innerHTML = `
+      <div class="no-print" style="margin-bottom:16px;"><button class="btn gold" onclick="downloadIdentityPDF()">Download Personal Identity (PDF)</button></div>
+      <div class="doc-wrap">
+        <div class="report-cover">
+          <div class="tag">🪪 Personal Identity</div>
+          <h1>${esc(p.name)}</h1>
+          <div class="meta"><b>${esc(p.major)}</b> · ${esc(p.semester)}</div>
+        </div>
+        ${(p.ikigaiSummary || p.swotSummary) ? `
+        <div class="report-section"><div class="sh"><h3>Executive Summary</h3></div>
+          <div class="card pad exec-summary" style="margin-bottom:0;">
+            ${p.ikigaiSummary ? `<div class="es-block"><div class="es-num">1</div><div class="es-body">${formatAiSummary_(p.ikigaiSummary)}</div></div>` : ''}
+            ${p.swotSummary ? `<div class="es-block"><div class="es-num">2</div><div class="es-body">${formatAiSummary_(p.swotSummary)}</div></div>` : ''}
+          </div>
+        </div>`: `<div class="empty">Ringkasan AI belum di-generate di spreadsheet. Buka sheet IKIGAI & SWOT ANALYSIS, klik tombol "Temukan IKIGAI/SWOT Kamu Disini 🔥" dulu.</div>`}
+        ${info ? `
+        <div class="report-section"><div class="sh">🧠<h3>MBTI — ${esc(rp.mbtiCode)} · ${esc(info.title)}</h3></div>
+          <div class="card pad">
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px;">Kelebihan</div>
+            <ul class="id-strengths">${info.strengths.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin:14px 0 6px;">Yang Perlu Diwaspadai</div>
+            <ul class="id-weak">${info.weaknesses.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin:14px 0 6px;">Arah Karir</div>
+            <div style="font-size:12.5px;line-height:1.6;">${esc(info.career)}</div>
+          </div>
+        </div>`: `<div class="empty">Kode MBTI "${esc(p.mbti)}" belum dikenali di database — cek lagi ejaan kodenya di sheet IKIGAI (harus 4 huruf, misal INFJ).</div>`}
+
+        <div class="report-section"><div class="sh">🎯<h3>Top 3 VIA Character</h3></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+            ${rp.viaDetailed.length ? rp.viaDetailed.map(v => `
+              <div class="card pad">
+                <div style="font-weight:700;font-size:12.5px;color:var(--navy);margin-bottom:5px;">${esc(v.name)}</div>
+                <div style="font-size:11.5px;line-height:1.55;color:var(--text);">${v.desc ? esc(v.desc) : 'Trait ini belum ada di database penjelasan gua — tapi tetap dicatat sebagai top karakter kamu dari hasil assessment.'}</div>
+              </div>`).join('') : '<div class="empty">—</div>'}
+          </div>
+        </div>
+
+        <div class="report-section"><div class="sh">💼<h3>Career Focus & Skill yang Diperlukan</h3></div>
+          <div class="card pad" style="margin-bottom:14px;">
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;">Career Focus (Sweetspot)</div>
+            <div style="font-family:var(--font-accent);font-style:italic;font-size:19px;color:var(--navy-lt);font-weight:400;margin-top:8px;">${esc(p.sweetspot || 'Sweetspot belum dipilih')}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px;">Ikigai spot: ${esc(p.ikigaiSpot || '-')}</div>
+          </div>
+          <div class="career-skill-grid">
+            <div class="card pad">
+              <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:10px;">Hardskill</div>
+              ${rp.hardDetailed.length ? rp.hardDetailed.map(h => `<div class="skill-item"><b>${esc(h.name)}</b><div class="note">${esc(h.note)}</div></div>`).join('') : '<div class="empty">—</div>'}
+            </div>
+            <div class="card pad">
+              <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:10px;">Softskill</div>
+              ${rp.softDetailed.length ? rp.softDetailed.map(s => `<div class="skill-item"><b>${esc(s.name)}</b><div class="note">${esc(s.note)}</div></div>`).join('') : '<div class="empty">—</div>'}
+            </div>
+          </div>
+        </div>
+
+        <div class="report-section"><div class="sh">💡<h3>Tips Mempertajam</h3></div>
+          <div class="card pad">
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px;">Personal Development</div>
+            <ul class="id-strengths">${rp.tipsPersonal.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+            <div class="k" style="font-size:10px;color:var(--faint);font-family:var(--font-mono);text-transform:uppercase;margin:14px 0 6px;">Di Kuliah</div>
+            <ul class="id-strengths">${rp.tipsCollege.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+          </div>
+        </div>
+
+        <div class="report-footer">Deskripsi MBTI/VIA = ringkasan umum, skill dijelasin generik — anggap starting point buat refleksi, bukan hasil akhir mutlak</div>
+      </div>`;
+      } catch (e) {
+        onErr(e);
+      }
+    }
+    function downloadIdentityPDF() {
+      const prevTitle = document.title;
+      document.title = 'Personal Identity';
+      document.body.classList.add('printing-identity');
+      toast('🖨️ Menyiapkan Save as PDF… (uncheck "Headers and footers" di More settings)');
+      setTimeout(() => { window.print(); setTimeout(() => { document.body.classList.remove('printing-identity'); document.title = prevTitle; }, 400); }, 300);
+    }
+    window.addEventListener('afterprint', () => { document.body.classList.remove('printing-report'); document.body.classList.remove('printing-identity'); });
+
+    // ══════════ SETUP (Ikigai & SWOT wizard) ══════════
+    // Alur: [data diri + pilih AI] -> [Ikigai: 1 Karakter&Minat -> link AI,
+    // 2 Sweet Spot Ikigai & Life Purpose -> link AI, 3 Sweetspot Career &
+    // Skill] -> [Analisis SWOT: link AI di atas, isian S/W/O/T 4 kolom di
+    // bawah]. Semua field nyambung ke cell spreadsheet (saveSetupField di
+    // Code.gs, whitelist SETUP_FIELDS). Prompt AI-nya sendiri TIDAK
+    // ditampilkan (link-nya aja) tapi tetap ditarik LIVE dari formula sheet
+    // (A17/A31/SWOT!A17) — begitu inputan berubah & tersimpan, link "Buka di
+    // AI" otomatis update kontennya sendiri di balik layar.
+    async function ensureSetupLoaded_(cb) {
+      if (S.setup) { cb(); return; }
+      showLoad(true);
+      try {
+        const r = await callApi('getSetupBundle');
+        S.setup = r; showLoad(false); cb();
+      } catch (e) {
+        showLoad(false); onErr(e);
+      }
+    }
+    function aiLinkCtaHtml_(promptText, label) {
+      if (!promptText) return `<div class="ai-link-cta disabled">🔒 Isi field di atas dulu buat ngaktifin link ini</div>`;
+      return `<button class="ai-link-cta ai-open-btn" data-prompt="${esc(promptText)}">🔗 ${esc(label)}</button>`;
+    }
+    function setupBlockHtml_(num, title, bodyHtml) {
+      return `<div class="setup-block">
+    <div class="setup-block-title"><span class="num">${num}</span>${esc(title)}</div>
+    ${bodyHtml}
+  </div>`;
+    }
+    function buildSetupHtml_() {
+      const s = S.setup, ik = s.ikigai, sw = s.swot, ctx = s.context;
+
+      const mbtiDatalist = `<datalist id="dl-mbti">${s.mbtiOptions.map(m => `<option value="${esc(m)}">`).join('')}</datalist>`;
+      const viaDatalist = `<datalist id="dl-via">${s.viaOptions.map(v => `<option value="${esc(v.label)}">`).join('')}</datalist>`;
+
+      const diriCard = `
+    <div class="setup-diri-card">
+      <div class="setup-diri-grid">
+        <div><label>Nama</label><input class="input" value="${esc(ctx.name)}" data-field="ctx_name" placeholder="Nama kamu"></div>
+        <div><label>Jurusan</label><input class="input" value="${esc(ctx.major)}" data-field="ctx_major" placeholder="Jurusan"></div>
+        <div><label>Semester</label><select class="input" data-field="ctx_semester">${s.semesterOptions.map(o => `<option ${o === ctx.semester ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>
+        <div><label>Karir Sesuai Jurusan?</label><select class="input" data-field="ctx_linear">${s.linearOptions.map(o => `<option ${o === ctx.linear ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></div>
+      </div>
+      <div class="ai-field" style="margin-top:14px;">
+        <label>Pilih AI Andalanmu</label>
+        <select class="input" id="setup-ai-select">${s.aiOptions.map(o => `<option value="${esc(o.key)}" ${o.key === s.aiChoice ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>
+      </div>
+    </div>`;
+
+      const step1Body = `
+    <div class="setup-field"><label>MBTI (wajib)</label>
+      <input class="input" list="dl-mbti" value="${esc(ik.mbti)}" data-field="ik_mbti" placeholder="mis. ENFJ">
+    </div>
+    <div class="setup-field"><label>Top 3 VIA Character (opsional, makin lengkap makin akurat)</label>
+      <div class="setup-grid3">${[0, 1, 2].map(i => `<input class="input" list="dl-via" value="${esc(ik.via[i] || '')}" data-field="ik_via${i + 1}" placeholder="Via #${i + 1}">`).join('')}</div>
+    </div>
+    <div class="setup-field"><label>Top 3 Career Explorer (opsional)</label>
+      <div class="setup-grid3">${[0, 1, 2].map(i => `<input class="input" value="${esc(ik.career[i] || '')}" data-field="ik_career${i + 1}" placeholder="Career #${i + 1}">`).join('')}</div>
+    </div>
+    ${aiLinkCtaHtml_(ik.prompt1, 'Temukan Ikigai Kamu Disini')}`;
+
+      const step2Body = `
+    <div class="setup-field"><label>Ikigai Spot Pilihanmu (paste hasil AI)</label>
+      <textarea class="input" rows="2" data-field="ik_spot" placeholder="mis. The Heart-Based Strategist">${esc(ik.spot)}</textarea>
+    </div>
+    <div class="setup-field"><label>Slice of Life Purpose Pilihanmu</label>
+      <textarea class="input" rows="2" data-field="ik_slice" placeholder="1 kalimat yang paling 'kamu banget'">${esc(ik.slice)}</textarea>
+    </div>
+    ${aiLinkCtaHtml_(ik.prompt2, 'Temukan Sweetspot Career Disini')}`;
+
+      const step3Body = `
+    <div class="setup-field"><label>Sweetspot Career Pilihanmu (paste hasil AI)</label>
+      <input class="input" value="${esc(ik.sweetspot)}" data-field="ik_sweetspot" placeholder="mis. Youth Coach">
+    </div>
+    <div class="setup-field"><label>Top 3 Hardskill</label>
+      <div class="setup-grid3">${[0, 1, 2].map(i => `<input class="input" value="${esc(ik.hardskills[i] || '')}" data-field="ik_hard${i + 1}" placeholder="Hardskill #${i + 1}">`).join('')}</div>
+    </div>
+    <div class="setup-field"><label>Top 3 Softskill</label>
+      <div class="setup-grid3">${[0, 1, 2].map(i => `<input class="input" value="${esc(ik.softskills[i] || '')}" data-field="ik_soft${i + 1}" placeholder="Softskill #${i + 1}">`).join('')}</div>
+    </div>`;
+
+      const swField_ = (field, val, ph) => `<div class="setup-field"><input class="input" value="${esc(val || '')}" data-field="${field}" placeholder="${esc(ph)}"></div>`;
+      const swotBody = `
+    ${aiLinkCtaHtml_(sw.prompt, 'Temukan SWOT Analysis Kamu Disini')}
+    <div class="swot-grid4" style="margin-top:16px;">
+      <div><div class="swot-col-head s">Strength</div>${[0, 1, 2].map(i => swField_('sw_strength' + (i + 1), sw.strength[i], '#' + (i + 1))).join('')}</div>
+      <div><div class="swot-col-head w">Weakness</div>${[0, 1, 2].map(i => swField_('sw_weakness' + (i + 1), sw.weakness[i], '#' + (i + 1))).join('')}</div>
+      <div><div class="swot-col-head o">Opportunity</div>${[0, 1, 2].map(i => swField_('sw_opportunity' + (i + 1), sw.opportunity[i], '#' + (i + 1))).join('')}</div>
+      <div><div class="swot-col-head t">Threat</div>${[0, 1, 2].map(i => swField_('sw_threat' + (i + 1), sw.threat[i], '#' + (i + 1))).join('')}</div>
+    </div>`;
+
+      return `
+    ${mbtiDatalist}${viaDatalist}
+    ${diriCard}
+    <div class="sec-head" style="margin-top:0;"><h2>1️⃣ Ikigai Setup</h2></div>
+    <div class="card pad" style="margin-bottom:22px;">
+      ${setupBlockHtml_('1', 'Karakter dan Minat', step1Body)}
+      ${setupBlockHtml_('2', 'Sweet Spot Ikigai dan Life Purpose', step2Body)}
+      ${setupBlockHtml_('3', 'Sweetspot Career & Skill', step3Body)}
+    </div>
+
+    <div class="sec-head"><h2>2️⃣ Analisis SWOT</h2></div>
+    <div class="card pad">${swotBody}</div>
+  `;
+    }
+    function renderSetup() {
+      ensureSetupLoaded_(() => {
+        document.getElementById('view-setup').innerHTML = buildSetupHtml_();
+        bindSetupEvents_();
+      });
+    }
+    function bindSetupEvents_() {
+      document.querySelectorAll('#view-setup .ai-open-btn').forEach(b => {
+        b.addEventListener('click', () => {
+          const ai = S.setup.aiOptions.find(o => o.key === S.setup.aiChoice) || S.setup.aiOptions[0];
+          if (!ai) { toast('Pilih AI dulu di atas ya'); return; }
+          openExternal_(ai.base + encodeURIComponent(b.dataset.prompt));
+        });
+      });
+      document.querySelectorAll('#view-setup [data-field]').forEach(el => {
+        const evt = el.tagName === 'SELECT' ? 'change' : 'blur';
+        el.addEventListener(evt, () => saveSetupField_(el.dataset.field, el.value, el));
+      });
+      document.getElementById('setup-ai-select').addEventListener('change', e => {
+        saveSetupField_('ai_choice', e.target.value, e.target, '✅ AI andalan tersimpan');
+      });
+    }
+    async function saveSetupField_(fieldKey, value, el, okMsg) {
+      el.disabled = true;
+      showLoad(true);
+      try {
+        const r = await callApi('saveSetupField', { fieldKey: fieldKey, value: value });
+        showLoad(false); el.disabled = false;
+        if (!r.success) { toast('Gagal simpan: ' + r.error); return; }
+        S.setup = r.setup;
+        toast(okMsg || '✅ Tersimpan ke sheet');
+        renderSetup();
+      } catch (e) {
+        showLoad(false); el.disabled = false; onErr(e);
+      }
+    }
+
+    const TITLES = { overview: ['Overview', 'Ringkasan profil & sweetspot karier kamu'], dream: ['Dream Plan', 'Goals per semester'], college: ['College Plan', 'Misi kuliah — semester saat ini'], action: ['Action Plan', 'Taktik eksekusi per quarter'], tracker: ['Tracker', 'Checklist mingguan dari Action Plan'], report: ['Report', 'Ringkasan perkembangan buat di-download'], identity: ['Personal Identity', 'Penjabaran karakter & arah karir kamu'], setup: ['Setup', 'Isi Ikigai & SWOT dari nol, nyambung langsung ke spreadsheet'] };
+    const RENDERERS = { overview: renderOverview, dream: renderDream, college: renderCollege, action: renderAction, tracker: renderTracker, report: renderReport, identity: renderIdentity, setup: renderSetup };
+    function go(view) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav').forEach(n => n.classList.toggle('active', n.dataset.view === view));
+      document.getElementById('view-' + view).classList.add('active');
+      document.getElementById('pg-title').textContent = TITLES[view][0];
+      document.getElementById('pg-sub').textContent = TITLES[view][1];
+      RENDERERS[view]();
+      window.scrollTo(0, 0);
+    }
+    function checkAuthAndInit_() {
+      const token = getToken();
+      const actPage = document.querySelector('.activation-page');
+      const sidebar = document.querySelector('.sidebar');
+      const main = document.querySelector('.main');
+
+      if (token) {
+        if (actPage) actPage.style.display = 'none';
+        if (sidebar) sidebar.style.display = '';
+        if (main) main.style.display = '';
+        startDashboard_();
+      } else {
+        if (actPage) actPage.style.display = 'flex';
+        if (sidebar) sidebar.style.display = 'none';
+        if (main) main.style.display = 'none';
+        checkActivationStatus_();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', checkAuthAndInit_, { once: true });
+    } else {
+      checkAuthAndInit_();
+    }
+
+    async function submitToken() {
+      const btn = document.getElementById('btn');
+      const msg = document.getElementById('msg');
+      const code = document.getElementById('tok').value.trim();
+      if (!code) { msg.className = 'msg err'; msg.textContent = 'Token belum diisi.'; return; }
+      btn.disabled = true;
+      btn.textContent = 'Memeriksa...';
+      msg.className = 'msg';
+      msg.textContent = '';
+
+      try {
+        const r = await callApi('activateWithToken', { code: code });
+        if (r && r.success) {
+          localStorage.setItem('user_token', code);
+          msg.className = 'msg ok';
+          msg.textContent = '✅ Aktivasi berhasil: ' + (r.produk || 'produk') + '.';
+          document.getElementById('tok').style.display = 'none';
+          btn.style.display = 'none';
+          const close = document.createElement('button');
+          close.className = 'closebtn';
+          close.textContent = 'Lanjut ke Dashboard';
+          close.onclick = function () {
+            checkAuthAndInit_();
+          };
+          document.body.querySelector('.activation-screen').appendChild(close);
+          const hint = document.createElement('div');
+          hint.className = 'sub';
+          hint.style.marginTop = '8px';
+          hint.textContent = 'Klik tombol di atas untuk masuk ke dashboard.';
+          document.body.querySelector('.activation-screen').appendChild(hint);
+        } else {
+          btn.disabled = false;
+          btn.textContent = 'Aktivasi Sekarang';
+          msg.className = 'msg err';
+          msg.textContent = '❌ ' + (r && r.error ? r.error : 'Token tidak valid.');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Aktivasi Sekarang';
+        msg.className = 'msg err';
+        msg.textContent = '❌ Error: ' + (err.message || err);
+      }
+    }
+
+    document.getElementById('tok').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') submitToken();
+    });
+
+    async function checkActivationStatus_() {
+      const tokInput = document.getElementById('tok');
+      if (tokInput) {
+        const savedToken = localStorage.getItem('user_token');
+        if (savedToken) {
+          tokInput.value = savedToken;
+        } else {
+          try {
+            const st = await callApi('getActivationStatus');
+            if (st && st.tokenInSheet) { tokInput.value = st.tokenInSheet; }
+          } catch (e) { }
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>
