@@ -27,15 +27,10 @@ function isActivated_() {
   return PropertiesService.getScriptProperties().getProperty(PROP_ACTIVATED) === 'true';
 }
 
-function getTokenInSheet_() {
+function getTokenInSheet_(userSpreadsheet) {
   try {
-    // PAKAI getSS_(), BUKAN SpreadsheetApp.getActiveSpreadsheet() langsung —
-    // getActiveSpreadsheet() selalu null kalau diakses lewat URL Web App
-    // (bukan dari dalam UI Sheets), jadi sebelumnya fungsi ini SELALU
-    // mikir cell token kosong padahal isinya ada. Ini akar penyebab
-    // "refresh abis aktivasi balik ke lock" dan "hapus kode tapi status
-    // di Rumah A nggak ikut berubah" — dua-duanya dari bug yang sama.
-    const sheet = getSS_().getSheetByName(SHEET_WELCOME);
+    if (!userSpreadsheet) return '';
+    const sheet = userSpreadsheet.getSheetByName(SHEET_WELCOME);
     if (!sheet) return '';
     return String(sheet.getRange(WELCOME_CODE_CELL).getValue() || '').trim();
   } catch (e) {
@@ -107,14 +102,14 @@ function validateAgainstRumahA_(email, code) {
 }
 
 /** Set/reset status aktivasi lokal + langsung sembunyiin/tampilin sheet. */
-function setActivatedState_(active, email, code) {
+function setActivatedState_(userSpreadsheet, active, email, code) {
   const props = PropertiesService.getScriptProperties();
   props.setProperty(PROP_ACTIVATED, active ? 'true' : 'false');
   if (active) {
     props.setProperty(PROP_ACTIVATED_EMAIL, email || '');
     props.setProperty(PROP_ACTIVATED_CODE, code || '');
   }
-  enforceContentVisibility_();
+  enforceContentVisibility_(userSpreadsheet);
 }
 
 /**
@@ -150,28 +145,9 @@ function notifyDeactivation_(email, code) {
  * SATU-SATUNYA sumber kebenaran status aktivasi — dipanggil ulang setiap
  * dashboard/spreadsheet dibuka (doGet, openDashboardModal, onOpen) dan
  * tiap ada edit di cell token (onIkigaiEdit_).
- *
- * Alur (disederhanain sesuai permintaan — kunci murni berdasarkan ada/
- * kosongnya cell, BUKAN re-validasi ke Rumah A tiap refresh):
- * 1. Cell WELCOME!G23 kosong -> paksa NONAKTIF. Kalau sebelumnya aktif,
- *    di titik INI aja (transisi ada->kosong) kirim sinyal deactivate ke
- *    Rumah A pakai email+code TERAKHIR yang tersimpan.
- * 2. Cell ADA isinya & sama persis kayak kode terakhir yang udah pernah
- *    tervalidasi & aktif -> percaya cache lokal, LANGSUNG aktif tanpa
- *    hit Rumah A lagi. Ini yang bikin refresh halaman nggak lagi
- *    ngebalikin ke layar kunci selama kodenya belum dihapus.
- * 3. Cell ADA isinya tapi beda dari kode terakhir (kode baru dipaste,
- *    atau belum pernah aktif sama sekali) -> WAJIB divalidasi ke Rumah A
- *    dulu, karena ini beneran butuh dicek keabsahannya.
- *
- * Trade-off yang perlu disadari: kalau lisensi di-revoke dari sisi admin
- * Rumah A doang (tanpa cell di sheet WELCOME ikut dikosongin), sisi user
- * TETAP kebuka sampai kodenya diganti/dihapus manual — karena sekarang
- * nggak ada re-check periodik ke Rumah A. Ini konsekuensi langsung dari
- * "refresh harus tetap kebuka selama kode masih ada" yang diminta.
  */
-function checkAndSyncActivation_() {
-  const code = getTokenInSheet_();
+function checkAndSyncActivation_(userSpreadsheet) {
+  const code = getTokenInSheet_(userSpreadsheet);
   const wasActive = isActivated_();
   const props = PropertiesService.getScriptProperties();
 
@@ -181,7 +157,7 @@ function checkAndSyncActivation_() {
       const lastCode = props.getProperty(PROP_ACTIVATED_CODE) || '';
       notifyDeactivation_(lastEmail, lastCode);
     }
-    setActivatedState_(false);
+    setActivatedState_(userSpreadsheet, false);
     return { activated: false, error: '' };
   }
 
@@ -193,31 +169,26 @@ function checkAndSyncActivation_() {
   const email = Session.getActiveUser().getEmail();
   const result = validateAgainstRumahA_(email, code);
   if (result.valid) {
-    setActivatedState_(true, email, code);
+    setActivatedState_(userSpreadsheet, true, email, code);
     return { activated: true, produk: result.produk, error: '' };
   }
-  setActivatedState_(false);
+  setActivatedState_(userSpreadsheet, false);
   return { activated: false, error: result.error };
 }
 
-function getActivationStatus() {
-  const status = checkAndSyncActivation_();
-  return { activated: status.activated, tokenInSheet: getTokenInSheet_(), error: status.error || '' };
+function getActivationStatus(userSpreadsheet) {
+  const status = checkAndSyncActivation_(userSpreadsheet);
+  return { activated: status.activated, tokenInSheet: getTokenInSheet_(userSpreadsheet), error: status.error || '' };
 }
 
 /**
  * Dipanggil dari Sidebar.html (branch aktivasi) waktu user ngetik token di
- * modal & klik "Aktivasi Sekarang". Token dari input dipakai langsung —
- * SEBELUMNYA fungsi ini nggak punya parameter & selalu baca ulang dari
- * sheet, jadi apapun yang diketik user diabaikan. Sekarang dipatch supaya
- * beneran nerima & sekaligus DITULIS BALIK ke sheet WELCOME (sinkron dua
- * arah — poin 1: input di dashboard atau di sheet, keduanya harus nyambung).
- * Email diambil dari SESI LOGIN AKTIF.
+ * modal & klik "Aktivasi Sekarang".
  */
-function activateWithToken(inputToken) {
+function activateWithToken(userSpreadsheet, inputToken) {
   Logger.log('[DEBUG] Memulai activateWithToken dengan input: ' + inputToken);
   const email = Session.getActiveUser().getEmail();
-  const code = String(inputToken || '').trim().toUpperCase() || getTokenInSheet_();
+  const code = String(inputToken || '').trim().toUpperCase() || getTokenInSheet_(userSpreadsheet);
   Logger.log('[DEBUG] Deteksi Email: ' + email + ', Code: ' + code);
 
   const result = validateAgainstRumahA_(email, code);
@@ -229,30 +200,29 @@ function activateWithToken(inputToken) {
   }
 
   try {
-    const sheet = getSS_().getSheetByName(SHEET_WELCOME);
-    if (sheet) {
-      sheet.getRange(WELCOME_CODE_CELL).setValue(code);
-      Logger.log('[DEBUG] Berhasil menulis token ke sheet WELCOME.');
+    if (userSpreadsheet) {
+      const sheet = userSpreadsheet.getSheetByName(SHEET_WELCOME);
+      if (sheet) {
+        sheet.getRange(WELCOME_CODE_CELL).setValue(code);
+        Logger.log('[DEBUG] Berhasil menulis token ke sheet WELCOME.');
+      }
     }
   } catch (e) { 
     Logger.log('[DEBUG] Exception saat menulis ke sheet WELCOME: ' + e.message);
   }
 
-  setActivatedState_(true, email, code);
+  setActivatedState_(userSpreadsheet, true, email, code);
   Logger.log('[DEBUG] setActivatedState_(true) berhasil dipanggil.');
   return { success: true, produk: result.produk };
 }
 
 /**
- * Trigger installable (BUKAN simple onEdit) — dipasang otomatis lewat
- * onOpen(). Perlu installable karena simple trigger nggak boleh manggil
- * UrlFetchApp, padahal notifyDeactivation_() butuh itu buat ngasih tau
- * Rumah A secara real-time begitu cell token dihapus/diubah — bukan cuma
- * nunggu spreadsheet/dashboard dibuka ulang.
+ * Trigger installable (BUKAN simple onEdit)
  */
-function ensureEditTrigger_() {
+function ensureEditTrigger_(userSpreadsheet) {
   try {
-    const ss = getSS_();
+    if (!userSpreadsheet) return;
+    const ss = userSpreadsheet;
     const already = ScriptApp.getProjectTriggers().some(function (t) {
       return t.getHandlerFunction() === 'onIkigaiEdit_' && t.getEventType() === ScriptApp.EventType.ON_EDIT;
     });
@@ -267,20 +237,17 @@ function onIkigaiEdit_(e) {
     if (!e || !e.range) return;
     if (e.range.getSheet().getName() !== SHEET_WELCOME) return;
     if (e.range.getA1Notation() !== WELCOME_CODE_CELL) return;
-    checkAndSyncActivation_();
+    checkAndSyncActivation_(e.range.getSheet().getParent());
   } catch (err) { /* jangan sampai nge-block proses edit user */ }
 }
 
 /**
- * Sembunyiin/tampilin SEMUA sheet KECUALI WELCOME (selalu kelihatan,
- * tempat token) dan TRACKER_STATE (selalu hidden, internal state).
- * Dinamis — otomatis nyakup sheet baru yang ditambahin nanti. WELCOME
- * sendiri sekarang nggak cuma dibiarin polos pas nonaktif — tampilannya
- * ditimpa jadi kelihatan kayak error runtime (lihat applyLockedAppearance_).
+ * Sembunyiin/tampilin SEMUA sheet KECUALI WELCOME dan TRACKER_STATE
  */
-function enforceContentVisibility_() {
+function enforceContentVisibility_(userSpreadsheet) {
   try {
-    const ss = getSS_(); // sama, jangan getActiveSpreadsheet() langsung (lihat catatan di getTokenInSheet_)
+    if (!userSpreadsheet) return;
+    const ss = userSpreadsheet;
     const visible = isActivated_();
 
     ss.getSheets().forEach(function (sh) {
@@ -554,33 +521,33 @@ function verifyWebAppUrl() {
   return { ok: true, url: url };
 }
 
-function getBundle() {
-  const dream = getDreamPlan_();
-  const college = getCollegePlan_();
+function getBundle(userSpreadsheet) {
+  const dream = getDreamPlan_(userSpreadsheet);
+  const college = getCollegePlan_(userSpreadsheet);
   return {
-    personal: getPersonal_(),
+    personal: getPersonal_(userSpreadsheet),
     dream, college,
-    action: getActionPlan_(),
-    gamification: getGamification_(dream, college),
+    action: getActionPlan_(userSpreadsheet),
+    gamification: getGamification_(userSpreadsheet, dream, college),
     trackerConfig: { startDate: getStartDate_().toISOString() },
     webAppUrl: getWebAppUrl_(),
   };
 }
 
-function getInitialBundle() {
-  const dream = getDreamPlan_();
-  const college = getCollegePlan_();
+function getInitialBundle(userSpreadsheet) {
+  const dream = getDreamPlan_(userSpreadsheet);
+  const college = getCollegePlan_(userSpreadsheet);
   return {
-    personal: getPersonal_(),
+    personal: getPersonal_(userSpreadsheet),
     dream, college,
-    gamification: getGamification_(dream, college),
+    gamification: getGamification_(userSpreadsheet, dream, college),
     trackerConfig: { startDate: getStartDate_().toISOString() },
     webAppUrl: getWebAppUrl_(),
   };
 }
 
-function getActionPlanOnly() {
-  return { action: getActionPlan_() };
+function getActionPlanOnly(userSpreadsheet) {
+  return { action: getActionPlan_(userSpreadsheet) };
 }
 
 function semesterNum_(label) {
@@ -614,8 +581,9 @@ function isUnresolved_(displayVal, formulaStr) {
   return false;
 }
 
-function getPersonal_() {
-  const ss = getSS_();
+function getPersonal_(userSpreadsheet) {
+  if (!userSpreadsheet) return null;
+  const ss = userSpreadsheet;
   const ik = ss.getSheetByName(SHEET_IKIGAI);
   const sw = ss.getSheetByName(SHEET_SWOT);
   if (!ik) return null;
@@ -645,8 +613,9 @@ function getPersonal_() {
   return { name, major, semester, semesterNum: semesterNum_(semester), linear, mbti, via, careerExplorer, ikigaiSpot, sliceOfLife, sweetspot, hardskills, softskills, swot, ikigaiSummary, swotSummary };
 }
 
-function getDreamPlan_() {
-  const ss = getSS_();
+function getDreamPlan_(userSpreadsheet) {
+  if (!userSpreadsheet) return { semesters: [], goals: [], bySemester: {}, summary: {} };
+  const ss = userSpreadsheet;
   const s = ss.getSheetByName(SHEET_DREAM);
   if (!s) return { semesters: [], goals: [], bySemester: {}, summary: {} };
 
@@ -680,17 +649,19 @@ function getDreamPlan_() {
   });
   return { semesters, goals, bySemester, summary, statusOptions: getValidationOptions_(s, DREAM_DATA_START_ROW, DREAM_COL.status, DREAM_STATUS_OPTIONS) };
 }
-function updateDreamStatus(row, status) {
+function updateDreamStatus(userSpreadsheet, row, status) {
   try {
-    const sheet = getSS_().getSheetByName(SHEET_DREAM);
+    if (!userSpreadsheet) throw new Error('userSpreadsheet tidak ditemukan');
+    const sheet = userSpreadsheet.getSheetByName(SHEET_DREAM);
     sheet.getRange(row, DREAM_COL.status).setValue(status);
     SpreadsheetApp.flush();
     return { success: true, value: sheet.getRange(row, DREAM_COL.status).getDisplayValue() };
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-function getCollegePlan_() {
-  const ss = getSS_();
+function getCollegePlan_(userSpreadsheet) {
+  if (!userSpreadsheet) return { semesters: [], missions: [], bySemester: {} };
+  const ss = userSpreadsheet;
   const s = ss.getSheetByName(SHEET_COLLEGE);
   if (!s) return { semesters: [], missions: [], bySemester: {} };
 
@@ -713,28 +684,78 @@ function getCollegePlan_() {
   const semesters = sortSemesters_(Object.keys(bySemester));
   return { semesters, missions, bySemester, statusOptions: getValidationOptions_(s, COLLEGE_DATA_START_ROW, COLLEGE_COL.progress, COLLEGE_STATUS_OPTIONS) };
 }
-function updateCollegeProgress(row, status) {
+function updateCollegeProgress(userSpreadsheet, row, status) {
   try {
-    const sheet = getSS_().getSheetByName(SHEET_COLLEGE);
+    if (!userSpreadsheet) throw new Error('userSpreadsheet tidak ditemukan');
+    const sheet = userSpreadsheet.getSheetByName(SHEET_COLLEGE);
     sheet.getRange(row, COLLEGE_COL.progress).setValue(status);
     SpreadsheetApp.flush();
     return { success: true, value: sheet.getRange(row, COLLEGE_COL.progress).getDisplayValue() };
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-function updateActionStatus(row, col, status) {
+function updateActionStatus(userSpreadsheet, row, col, status) {
   try {
-    const sheet = getSS_().getSheetByName(SHEET_ACTION);
+    if (!userSpreadsheet) throw new Error('userSpreadsheet tidak ditemukan');
+    const sheet = userSpreadsheet.getSheetByName(SHEET_ACTION);
     sheet.getRange(row, col).setValue(status);
     SpreadsheetApp.flush();
     return { success: true, value: sheet.getRange(row, col).getDisplayValue() };
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-function getActionPlan_() {
-  const ss = getSS_();
+function getActionPlan_(userSpreadsheet) {
+  if (!userSpreadsheet) return { blocks: [], statusOptions: AP_STATUS_OPTIONS };
+  const ss = userSpreadsheet;
   const s = ss.getSheetByName(SHEET_ACTION);
   if (!s) return { blocks: [], statusOptions: AP_STATUS_OPTIONS };
+
+  const lastRow = Math.min(AP_MAX_ROW, s.getLastRow());
+  const lastCol = 16;
+  if (lastRow < AP_BLOCK_START_ROW) return { blocks: [], statusOptions: AP_STATUS_OPTIONS };
+  const grid = s.getRange(1, 1, lastRow, lastCol).getDisplayValues();
+  const formulaGrid = s.getRange(1, 1, lastRow, lastCol).getFormulas();
+  const cell = (r, c) => (grid[r - 1] && grid[r - 1][c - 1] !== undefined) ? grid[r - 1][c - 1] : '';
+  const cellF = (r, c) => (formulaGrid[r - 1] && formulaGrid[r - 1][c - 1] !== undefined) ? formulaGrid[r - 1][c - 1] : '';
+
+  const blocks = [];
+  let idx = 0;
+  for (let start = AP_BLOCK_START_ROW; start <= lastRow; start += AP_BLOCK_SIZE) {
+    AP_GROUPS.forEach(grp => {
+      const headerRow = start + AP_HEADER_OFFSET;
+      if (headerRow > lastRow) return;
+      const headerText = cell(headerRow, grp.colGoal);
+      if (!headerText || headerText === AP_PLACEHOLDER || isUnresolved_(headerText, cellF(headerRow, grp.colGoal)) || looksLikeArtifact_(headerText)) return;
+
+      const dataStart = start + AP_DATA_OFFSET;
+      const tactics = [];
+      for (let j = 0; j < AP_DATA_ROWS; j++) {
+        const r = dataStart + j;
+        if (r > lastRow) break;
+        const taktikVal = cell(r, grp.colTaktik);
+        if (!taktikVal || isUnresolved_(taktikVal, cellF(r, grp.colTaktik)) || looksLikeArtifact_(taktikVal)) continue;
+
+        const frekValRaw = cell(r, grp.colFrek);
+        const frekBad = isUnresolved_(frekValRaw, cellF(r, grp.colFrek)) || looksLikeArtifact_(frekValRaw);
+        const frekuensi = frekBad ? '' : frekValRaw;
+        const statusValRaw = cell(r, grp.colStatus);
+        const statusBad = isUnresolved_(statusValRaw, cellF(r, grp.colStatus)) || looksLikeArtifact_(statusValRaw);
+        const status = statusBad ? 'Belum Dimulai' : (statusValRaw || 'Belum Dimulai');
+        const meta = frekuensi ? parseFrequencyMeta_(frekuensi) : { target: 1, periodWeeks: 1 };
+
+        tactics.push({
+          no: cell(r, grp.colNo), taktik: taktikVal, frekuensi, status,
+          target: meta.target, periodWeeks: meta.periodWeeks,
+          row: r, statusCol: grp.colStatus,
+        });
+      }
+      if (tactics.length === 0) return;
+      blocks.push({ idx: idx++, quarter: grp.key, quarterLabel: grp.label, goal: headerText, tactics });
+    });
+  }
+  const statusOptions = getValidationOptions_(s, AP_BLOCK_START_ROW + AP_DATA_OFFSET, AP_GROUPS[0].colStatus, AP_STATUS_OPTIONS);
+  return { blocks, statusOptions };
+}
 
   const lastRow = Math.min(AP_MAX_ROW, s.getLastRow());
   const lastCol = 16;
@@ -816,8 +837,9 @@ function parseFrequencyMeta_(freq) {
   return { target, periodWeeks };
 }
 
-function ensureTrackerState_() {
-  const ss = getSS_();
+function ensureTrackerState_(userSpreadsheet) {
+  if (!userSpreadsheet) throw new Error('userSpreadsheet tidak ditemukan');
+  const ss = userSpreadsheet;
   let s = ss.getSheetByName(SHEET_TRACKER_STATE);
   if (!s) {
     s = ss.insertSheet(SHEET_TRACKER_STATE);
@@ -874,10 +896,10 @@ function setTrackerStartDate(dateStr) {
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-function getTrackerView(quarter, cachedBlocks) {
-  const blocksAll = Array.isArray(cachedBlocks) ? cachedBlocks : getActionPlan_().blocks;
+function getTrackerView(userSpreadsheet, quarter, cachedBlocks) {
+  const blocksAll = Array.isArray(cachedBlocks) ? cachedBlocks : getActionPlan_(userSpreadsheet).blocks;
   const start = getStartDate_();
-  const stateSheet = ensureTrackerState_();
+  const stateSheet = ensureTrackerState_(userSpreadsheet);
   const stateMap = readTrackerStateMap_(stateSheet);
   const blocks = blocksAll.filter(b => b.quarter === quarter);
 
@@ -917,8 +939,8 @@ function getTrackerView(quarter, cachedBlocks) {
   return { quarter, weeks, goals, startDate: start.toISOString() };
 }
 
-function toggleTrackerCheck2(quarter, goalIdx, tacticNo, week, dayIndex, value, target, periodWeeks) {
-  const s = ensureTrackerState_();
+function toggleTrackerCheck2(userSpreadsheet, quarter, goalIdx, tacticNo, week, dayIndex, value, target, periodWeeks) {
+  const s = ensureTrackerState_(userSpreadsheet);
   const label = periodLabelForWeek_(week, periodWeeks);
   const key = trackerKey_(quarter, goalIdx, tacticNo, label);
   const row = trackerRow_(s, key);
@@ -932,9 +954,9 @@ function toggleTrackerCheck2(quarter, goalIdx, tacticNo, week, dayIndex, value, 
   return { success: true };
 }
 
-function checkAllTrackerWeek(quarter, goalIdx, tacticNo, week, target, periodWeeks) {
+function checkAllTrackerWeek(userSpreadsheet, quarter, goalIdx, tacticNo, week, target, periodWeeks) {
   try {
-    const s = ensureTrackerState_();
+    const s = ensureTrackerState_(userSpreadsheet);
     const label = periodLabelForWeek_(week, periodWeeks);
     const key = trackerKey_(quarter, goalIdx, tacticNo, label);
     const row = trackerRow_(s, key);
@@ -946,15 +968,15 @@ function checkAllTrackerWeek(quarter, goalIdx, tacticNo, week, target, periodWee
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-function getGamification_(dream, college) {
-  dream = dream || getDreamPlan_();
-  college = college || getCollegePlan_();
+function getGamification_(userSpreadsheet, dream, college) {
+  dream = dream || getDreamPlan_(userSpreadsheet);
+  college = college || getCollegePlan_(userSpreadsheet);
   const dreamScore = dream.summary.tercapai * SCORE_DREAM_TERCAPAI + dream.summary.onProgress * SCORE_DREAM_PROGRESS;
   const collegeTercapai = college.missions.filter(m => String(m.progress).toLowerCase().indexOf('tercapai') >= 0).length;
   const collegeScore = collegeTercapai * SCORE_COLLEGE_TERCAPAI;
 
   let trackerScore = 0;
-  const stateSheet = ensureTrackerState_();
+  const stateSheet = ensureTrackerState_(userSpreadsheet);
   const lastRow = stateSheet.getLastRow();
   if (lastRow >= 2) {
     const vals = stateSheet.getRange(2, 2, lastRow - 1, 7).getValues();
@@ -977,13 +999,13 @@ function getGamification_(dream, college) {
 
   return { total, badge, nextBadge, specialBadges, breakdown: { dream: dreamScore, college: collegeScore, tracker: trackerScore } };
 }
-function getGamificationOnly() { return getGamification_(); }
+function getGamificationOnly(userSpreadsheet) { return getGamification_(userSpreadsheet); }
 
-function getReportData_() {
-  const personal = getPersonal_();
-  const dream = getDreamPlan_();
-  const college = getCollegePlan_();
-  const gamification = getGamification_(dream, college);
+function getReportData_(userSpreadsheet) {
+  const personal = getPersonal_(userSpreadsheet);
+  const dream = getDreamPlan_(userSpreadsheet);
+  const college = getCollegePlan_(userSpreadsheet);
+  const gamification = getGamification_(userSpreadsheet, dream, college);
   const curNum = personal ? personal.semesterNum : 999;
 
   const dreamEval = dream.goals.filter(g => semesterNum_(g.targetSem) <= curNum)
@@ -998,7 +1020,7 @@ function getReportData_() {
     collegeDoneCount: collegeEval.filter(m => String(m.progress).toLowerCase().indexOf('tercapai') >= 0).length,
   };
 }
-function getReportBundle() { return getReportData_(); }
+function getReportBundle(userSpreadsheet) { return getReportData_(userSpreadsheet); }
 
 // ============================================================
 // PERSONAL IDENTITY REPORT (penjabaran MBTI dsb)
@@ -1098,8 +1120,8 @@ const TIPS_COLLEGE = [
   'Cari mentor atau senior yang udah di jalur karir yang kamu incar, minimal buat sekali ngobrol tiap semester.',
 ];
 
-function getIdentityReport_() {
-  const p = getPersonal_();
+function getIdentityReport_(userSpreadsheet) {
+  const p = getPersonal_(userSpreadsheet);
   const match = String(p ? p.mbti : '').toUpperCase().match(/[EI][NS][FT][JP]/);
   const code = match ? match[0] : '';
   const info = MBTI_INFO[code] || null;
@@ -1113,7 +1135,7 @@ function getIdentityReport_() {
     generatedAt: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMMM yyyy"),
   };
 }
-function getIdentityBundle() { return getIdentityReport_(); }
+function getIdentityBundle(userSpreadsheet) { return getIdentityReport_(userSpreadsheet); }
 
 // ============================================================
 // SETUP — wizard pengisian Ikigai & SWOT
@@ -1176,8 +1198,9 @@ const VIA_LABEL_ID = {
 };
 const VIA_OPTIONS = Object.keys(VIA_INFO).map(k => ({ key: k, label: VIA_LABEL_ID[k] || k }));
 
-function getSetupData_() {
-  const ss = getSS_();
+function getSetupData_(userSpreadsheet) {
+  if (!userSpreadsheet) return null;
+  const ss = userSpreadsheet;
   const ik = ss.getSheetByName(SHEET_IKIGAI);
   const sw = ss.getSheetByName(SHEET_SWOT);
   const wc = ss.getSheetByName(SHEET_WELCOME);
@@ -1224,17 +1247,18 @@ function getSetupData_() {
     viaOptions: VIA_OPTIONS,
   };
 }
-function getSetupBundle() { return getSetupData_(); }
+function getSetupBundle(userSpreadsheet) { return getSetupData_(userSpreadsheet); }
 
-function saveSetupField(fieldKey, value) {
+function saveSetupField(userSpreadsheet, fieldKey, value) {
   try {
+    if (!userSpreadsheet) throw new Error('userSpreadsheet tidak ditemukan');
     const def = SETUP_FIELDS[fieldKey];
     if (!def) throw new Error('Field Setup tidak dikenal: ' + fieldKey);
-    const sheet = getSS_().getSheetByName(def.sheet);
+    const sheet = userSpreadsheet.getSheetByName(def.sheet);
     if (!sheet) throw new Error('Sheet "' + def.sheet + '" tidak ditemukan.');
     sheet.getRange(def.cell).setValue(value);
     SpreadsheetApp.flush();
-    return { success: true, setup: getSetupData_() };
+    return { success: true, setup: getSetupData_(userSpreadsheet) };
   } catch (e) {
     return { success: false, error: e.message };
   }

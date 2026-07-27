@@ -6,6 +6,7 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var action = data.action;
     var token = data.token; // Token aktivasi unik user
+    var payload = data.payload || {};
     
     // 1. Validasi Token dan Ambil Spreadsheet ID milik user dari database 'activations'
     var userInfo = getUserInfoByToken_(token);
@@ -21,12 +22,80 @@ function doPost(e) {
     
     // 2. Routing aksi berdasarkan permintaan dari Vercel
     var result = {};
-    if (action === "getData") {
-      result = handleGetData_(userSpreadsheet);
-    } else if (action === "updateData") {
-      result = handleUpdateData_(userSpreadsheet, data.payload);
-    } else {
-      result = { success: false, message: "Aksi tidak dikenal." };
+    switch (action) {
+      case "getBundle":
+        result = getBundle(userSpreadsheet);
+        break;
+      case "getInitialBundle":
+        result = getInitialBundle(userSpreadsheet);
+        break;
+      case "getActionPlanOnly":
+        result = getActionPlanOnly(userSpreadsheet);
+        break;
+      case "getDreamPlan":
+        result = getDreamPlan_(userSpreadsheet);
+        break;
+      case "updateDreamStatus":
+        result = updateDreamStatus(userSpreadsheet, payload.row, payload.status);
+        break;
+      case "getCollegePlan":
+        result = getCollegePlan_(userSpreadsheet);
+        break;
+      case "updateCollegeProgress":
+        result = updateCollegeProgress(userSpreadsheet, payload.row, payload.status);
+        break;
+      case "updateActionStatus":
+        result = updateActionStatus(userSpreadsheet, payload.row, payload.col, payload.status);
+        break;
+      case "getActionPlan":
+        result = getActionPlan_(userSpreadsheet);
+        break;
+      case "getTrackerView":
+        result = getTrackerView(userSpreadsheet, payload.quarter, payload.cachedBlocks);
+        break;
+      case "toggleTrackerCheck2":
+        result = toggleTrackerCheck2(userSpreadsheet, payload.quarter, payload.goalIdx, payload.tacticNo, payload.week, payload.dayIndex, payload.value, payload.target, payload.periodWeeks);
+        break;
+      case "checkAllTrackerWeek":
+        result = checkAllTrackerWeek(userSpreadsheet, payload.quarter, payload.goalIdx, payload.tacticNo, payload.week, payload.target, payload.periodWeeks);
+        break;
+      case "setTrackerStartDate":
+        result = setTrackerStartDate(payload.dateStr);
+        break;
+      case "getGamification":
+        result = getGamificationOnly(userSpreadsheet);
+        break;
+      case "getReportBundle":
+        result = getReportBundle(userSpreadsheet);
+        break;
+      case "getIdentityBundle":
+        result = getIdentityBundle(userSpreadsheet);
+        break;
+      case "getSetupBundle":
+        result = getSetupBundle(userSpreadsheet);
+        break;
+      case "saveSetupField":
+        result = saveSetupField(userSpreadsheet, payload.fieldKey, payload.value);
+        break;
+      case "verifyWebAppUrl":
+        result = verifyWebAppUrl();
+        break;
+      case "activateWithToken":
+        result = activateWithToken(userSpreadsheet, payload.inputToken);
+        break;
+      case "getActivationStatus":
+        result = getActivationStatus(userSpreadsheet);
+        break;
+      // Legacy/Custom Handlers
+      case "getData":
+        result = handleGetData_(userSpreadsheet);
+        break;
+      case "updateData":
+        result = handleUpdateData_(userSpreadsheet, payload);
+        break;
+      default:
+        result = { success: false, message: "Aksi '" + action + "' tidak dikenal." };
+        break;
     }
     
     return ContentService.createTextOutput(JSON.stringify(result))
