@@ -2495,9 +2495,9 @@
             try {
                 const b = await callApi('getInitialBundle');
                 clearTimeout(bootTimer);
-                if (!b || !b.success) {
+                if (!b || b.success === false) {
                     showLoad(false);
-                    onFatal(b && b.error ? b.error : 'Gagal memuat data awal');
+                    showFatal(b && (b.error || b.message) ? (b.error || b.message) : 'Gagal memuat data awal');
                     return;
                 }
                 S.personal = b.personal; S.dream = b.dream; S.college = b.college;
